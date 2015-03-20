@@ -14,7 +14,7 @@ require.config({
         'moment': '../lib/moment/moment',
         'domain':'./data/domain',
         'model':'./data/model',
-        'services':'./data/domain',
+        'services':'./data/services',
         'test':'./data/test'
     },
     shim: {
@@ -40,10 +40,11 @@ require.config({
 
 // require the unit tests.
 require(
-    ['q','knockout','QUnit', 'test/dummyTest'],
-    function(Q,ko, QUnit, dummyTest) {
+    ['q','QUnit','test/itemdatamanager-test'],
+    function(Q,QUnit, mytest) {
         // run the tests.
-        dummyTest.run();
+        //dummyTest.run();
+        mytest.run();
         // start QUnit.
         QUnit.load();
         QUnit.start();
