@@ -14,6 +14,7 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./data/test/dummyTest.ts",
         "./infodata.ts",
         "./viewmodels/flickr.ts",
         "./viewmodels/shell.ts",

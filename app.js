@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 //var users = require('./routes/users');
-//var test = require('./routes/test');
+var test = require('./routes/test');
 //var infos = require('./routes/infos');
 
 var app = express();
@@ -24,9 +24,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-//var DataServer = require('./dataserver/server');
-//var myServer = new DataServer(app);
-//app.use('/test',test);
+var DataServer = require('./dataserver/server');
+var myServer = new DataServer(app);
+app.use('/test',test);
 //app.use('/users', users);
 //app.use('/infos',infos);
 

@@ -1,0 +1,26 @@
+{
+    "version": "1.4.1",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "../public/lib/typings/**/*.ts",
+        "!./node_modules/**/*.ts"
+    ],
+    "files": [
+        "./dbmanager.ts",
+        "./server.ts",
+        "../public/lib/typings/durandal/durandal.d.ts",
+        "../public/lib/typings/jquery/jquery.d.ts",
+        "../public/lib/typings/knockout/knockout.d.ts",
+        "../public/lib/typings/moment/moment.d.ts",
+        "../public/lib/typings/q/Q.d.ts",
+        "../public/lib/typings/qunit/qunit.d.ts"
+    ]
+}

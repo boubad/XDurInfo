@@ -44,7 +44,6 @@ require(
     function(Q,ko, QUnit, dummyTest) {
         // run the tests.
         dummyTest.run();
-        baseItemTest.run();
         // start QUnit.
         QUnit.load();
         QUnit.start();
