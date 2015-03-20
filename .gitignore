@@ -26,3 +26,5 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+public/app/data/**/*.js
+public/app/viewmodels/**/*.js

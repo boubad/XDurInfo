@@ -1,0 +1,28 @@
+{
+    "version": "1.4.1",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "amd",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "../lib/typings/**/*.ts",
+        "!./node_modules/**/*.ts"
+    ],
+    "files": [
+        "./infodata.ts",
+        "./viewmodels/flickr.ts",
+        "./viewmodels/shell.ts",
+        "./viewmodels/welcome.ts",
+        "../lib/typings/durandal/durandal.d.ts",
+        "../lib/typings/jquery/jquery.d.ts",
+        "../lib/typings/knockout/knockout.d.ts",
+        "../lib/typings/moment/moment.d.ts",
+        "../lib/typings/q/Q.d.ts",
+        "../lib/typings/qunit/qunit.d.ts"
+    ]
+}
