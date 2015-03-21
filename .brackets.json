@@ -1,0 +1,12 @@
+{
+    "sbruchmann.staticpreview.basepath": "/home/boubad/projects/GitHub/XDurInfo/",
+    "typescript": {
+        "target": "ES5",
+        "module": "AMD",
+        "noImplicitAny": true,
+        "sources" : [
+            "public/lib/typings/**/*.ts",
+            "public/app/**/*.ts"
+        ]
+    }
+}

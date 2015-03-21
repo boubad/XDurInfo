@@ -1,9 +1,9 @@
 //unite.ts
 import InfoData = require('../../infodata');
 //
-import SigleNameItem = require('./siglenameitem');
+import DepartementSigleNameItem = require('./departementsiglename');
 //
-class Unite extends SigleNameItem implements InfoData.IUnite {
+class Unite extends DepartementSigleNameItem implements InfoData.IUnite {
   constructor(oMap?: any) {
     super(oMap);
   } // constructor

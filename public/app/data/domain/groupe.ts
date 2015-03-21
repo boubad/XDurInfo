@@ -1,9 +1,9 @@
 //groupe.ts
 import InfoData = require('../../infodata');
 //
-import SigleNameItem = require('./siglenameitem');
+import DepartementSigleNameItem = require('./departementsiglename');
 //
-class Groupe extends SigleNameItem  implements InfoData.IGroupe {
+class Groupe extends DepartementSigleNameItem  implements InfoData.IGroupe {
   constructor(oMap?: any) {
     super(oMap);
   } // constructor

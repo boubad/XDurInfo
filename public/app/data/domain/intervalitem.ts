@@ -2,9 +2,9 @@
 import InfoData = require('../../infodata');
 //
 import BaseItem = require('./baseitem');
-import SigleNameItem = require('./siglenameitem');
+import DepartementSigleNameItem = require('./departementsiglename');
 //
-class IntervalItem extends SigleNameItem implements InfoData.IIntervalItem {
+class IntervalItem extends DepartementSigleNameItem implements InfoData.IIntervalItem {
   private _start: Date;
   private _end: Date;
   //

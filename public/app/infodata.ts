@@ -13,6 +13,16 @@ export interface IBaseItem {
   //
   to_insert_map: (oMap: any) => void;
   to_fetch_map: (oMap: any) => void;
+  //
+  sigle?:string;
+  name?:string;
+  remarks?:string;
+  departementid?:any;
+  anneeid?:any;
+  semestreid?:any;
+  uniteid?:any;
+  matiereid?:any;
+  groupeid?:any;
 }// interface IBaseItem
 export interface IDescriptionItem extends IBaseItem {
   remarks: string;
@@ -128,25 +138,25 @@ export interface IEtudiantPerson extends IPerson {
   has_mentionBac: boolean;
   has_etudesSuperieures: boolean;
 }// interface IEtudiantPerson
-export interface IDepartement extends IDescriptionItem {
-  sigle: string;
-  name: string;
-  //
-  has_sigle: boolean;
-  has_name: boolean;
-}// interface IDepartement
-export interface IDepartementChild extends IDescriptionItem {
-  departementid: any;
-  has_departementid: boolean;
-}// interface IDepartementChild
-export interface ISigleNameItem extends IDepartementChild {
+export interface ISigleNameItem extends IDescriptionItem {
   sigle: string;
   name: string;
   //
   has_sigle: boolean;
   has_name: boolean;
 }// interface ISigleNameItem
-export interface IIntervalItem extends ISigleNameItem {
+export interface IDepartement extends ISigleNameItem {
+}// interface IDepartement
+export interface IDepartementChild extends IDescriptionItem {
+  departementid: any;
+  has_departementid: boolean;
+}// interface IDepartementChild
+
+export interface IDepartementSigleNameItem extends ISigleNameItem  {
+  departementid:any;
+  has_departementid:boolean;
+}// interface IDepartement
+export interface IIntervalItem extends IDepartementSigleNameItem  {
   startDate: Date;
   endDate: Date;
   //
@@ -155,17 +165,17 @@ export interface IIntervalItem extends ISigleNameItem {
 }// interface ISigleNameItem
 export interface IAnnee extends IIntervalItem {
 }
-export interface IGroupe extends ISigleNameItem {
+export interface IGroupe extends IDepartementSigleNameItem {
 
 }// interface IGroupe
-export interface IUnite extends ISigleNameItem {
+export interface IUnite extends IDepartementSigleNameItem {
 
 }// interface IUnite
 export interface ISemestre extends IIntervalItem {
   anneeid: any;
   has_anneeid: boolean;
 }// interface ISemestre
-export interface IMatiere extends ISigleNameItem {
+export interface IMatiere extends IDepartementSigleNameItem {
   uniteid: any;
   coefficient: number;
   ecs: number;
@@ -300,3 +310,7 @@ export interface IDataManager {
   maintains_one_item: (item: IBaseItem) => Q.IPromise<any>;
   remove_one_item: (item: IBaseItem) => Q.IPromise<any>;
 }// interface IDataManager
+export interface IMenuDesc {
+  refer:string;
+  title:string;
+}

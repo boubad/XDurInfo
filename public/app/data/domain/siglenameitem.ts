@@ -1,9 +1,9 @@
 // siglenameitem.ts
 import InfoData = require('../../infodata');
 //
-import DepartementChildItem = require('./departementchild');
+import DescriptionItem = require('./descriptionitem');
 //
-class SigleNameItem extends DepartementChildItem implements InfoData.ISigleNameItem{
+class SigleNameItem extends DescriptionItem implements InfoData.ISigleNameItem{
   private _sigle: string;
   private _name: string;
   //
@@ -46,7 +46,7 @@ class SigleNameItem extends DepartementChildItem implements InfoData.ISigleNameI
   }
   public get is_storeable(): boolean {
     return (this.type != null) && (this.collection_name != null) &&
-      this.has_departementid && this.has_sigle;
+      this.has_sigle;
   }
   to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);

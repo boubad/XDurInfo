@@ -1,9 +1,9 @@
 //matiere.ts
 import InfoData = require('../../infodata');
 //
-import SigleNameItem = require('./siglenameitem');
+import DepartementSigleNameItem = require('./departementsiglename');
 //
-class Matiere extends SigleNameItem implements InfoData.IMatiere {
+class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
   _uniteid: any;
   _coef: number;
   _ecs: number;
