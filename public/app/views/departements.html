@@ -1,0 +1,77 @@
+<div class="container">
+  <div class="page-header">
+    <h1>
+      <span data-bind="text: title"></span>
+    </h1>
+  </div>
+  <div data-bind="visible: hasError">
+    <p class="text-danger">
+      <span data-bind="text: error"></span>
+    </p>
+  </div>
+  <div data-bind="visible: hasInfo">
+    <p class="text-success">
+      <span data-bind="text: info"></span>
+    </p>
+  </div>
+  <div data-bind="visible: hasCurrent">
+    <ul class="nav nav-tabs" data-bind="foreach: menu">
+      <li>
+        <a data-bind="attr:{href: refer, title: title}">
+          <span data-bind="text: title">
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="row">
+    <div data-bind="visible: hasItems" class="col-xs-4">
+      <div data-bind="visible: hasPage">
+        <ul class="pager">
+          <li>
+            <a data-bind="attr:{visible: canPrevPage, click: firstPage, href: '#'}">Début</a>
+          </li>
+          <li>
+            <a data-bind="attr:{visible: canPrevPage, click: prevPage, href: '#'}">Précédent</a>
+          </li>
+          <li>
+            <a data-bind="attr:{visible: canNextPage, click: nextPage, href: '#'}">Suivant</a>
+          </li>
+          <li>
+            <a data-bind="attr:{visible: canNextPage, click: lastPage, href: '#'}">Fin</a>
+          </li>
+        </ul>
+        <div data-bind="visible: hasStatus">
+          <span class="text-primary" data-bind="text: status"></span>
+        </div>
+      </div>
+      <form role="form">
+        <select class="form-control" data-bind="options: items, optionsText: 'name', value: current" size="16" />
+      </form>
+    </div>
+    <div class="col-xs-6">
+      <div>
+        <button type="button" class="btn btn-primary" data-bind="click: refreshAll">Refresh</button>
+      </div>
+      <form role="form">
+        <div class="form-group">
+          <label for="sigle">Abbreviation:</label>
+          <input type="text" class="form-control" id="sigle" data-bind="value: sigle" placeholder="Abbreviation">
+        </div>
+        <div class="form-group">
+          <label for="nom">Nom complet:</label>
+          <input type="text" class="form-control" id="nom" data-bind="value: name" placeholder="Nom complet">
+        </div>
+        <div class="form-group">
+          <label for="rem">Description:</label>
+          <textarea id="rem" data-bind="value:description" rows="6" placeholder="Description"></textarea>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" data-bind="visible: canAdd, click: addNew">Nouveau</button>
+          <button type="button" class="btn btn-primary" data-bind="visible: canCancel, click: cancel">Annuler</button>
+          <button type="button" class="btn btn-primary" data-bind="visible:canSave, click: save">Enregistrer</button>
+          <button type="button" class="btn btn-primary" data-bind="visible: canRemove, click:remove">Supprimer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

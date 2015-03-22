@@ -60,6 +60,7 @@
         "./data/test/infohttpmanager.ts",
         "./data/test/itemdatamanager-test.ts",
         "./infodata.ts",
+        "./viewmodels/departements.ts",
         "./viewmodels/flickr.ts",
         "./viewmodels/shell.ts",
         "./viewmodels/welcome.ts",

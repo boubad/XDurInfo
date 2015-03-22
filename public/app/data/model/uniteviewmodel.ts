@@ -7,6 +7,7 @@ import DepartementSigleNameViewModel = require('./departementsiglenameviewmodel'
 class UniteViewModel extends DepartementSigleNameViewModel {
   constructor() {
     super(new Unite());
+    this.title = 'Unités';
   }
   public update_menu():void {
     var mm:InfoData.IMenuDesc[] = [];

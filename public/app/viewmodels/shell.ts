@@ -13,6 +13,7 @@ var shell = {
   activate: () => {
     router.map([
       { route: '', title: 'Welcome', moduleId: 'viewmodels/welcome', nav: true },
+      { route: 'admin', title: 'Admin', moduleId: 'viewmodels/departements', nav: true },
       { route: 'flickr', moduleId: 'viewmodels/flickr', nav: true }
     ]).buildNavigationModel();
 
