@@ -4,8 +4,8 @@ import BaseItem = require('../domain/baseitem');
 import PagedViewModel = require('./pagedviewmodel');
 //
 class SigleNameViewModel extends PagedViewModel {
-  constructor(service: InfoData.IDataManager, model: InfoData.ISigleNameItem) {
-    super(service, model);
+  constructor(model: InfoData.ISigleNameItem) {
+    super(model);
   }
   public get sigle(): string {
     if ((this.current !== undefined) && (this.current !== null)) {
@@ -20,7 +20,7 @@ class SigleNameViewModel extends PagedViewModel {
     }
   }
   //
-  public get SigleNameViewModel(): string {
+  public get name(): string {
     if ((this.current !== undefined) && (this.current !== null)) {
       return this.current.name;
     } else {

@@ -18,8 +18,8 @@ class PagedViewModel extends BaseViewModel {
   private _add_mode: boolean;
 
   //
-  constructor(server: InfoData.IDataManager, model: InfoData.IBaseItem) {
-    super(server);
+  constructor(model: InfoData.IBaseItem) {
+    super();
     this.modelItem = model;
     this.items = [];
     this.pagesCount = 0;
@@ -34,6 +34,7 @@ class PagedViewModel extends BaseViewModel {
   //
   public change_current(s: InfoData.IBaseItem) {
     this._currentItem = s;
+    this.error = null;
     this.update_menu();
   }
   public get current(): InfoData.IBaseItem {
@@ -57,9 +58,32 @@ class PagedViewModel extends BaseViewModel {
   public get canRemove(): boolean {
     return ((this.current !== null) && this.current.has_id);
   }
+  public remove(): void {
+    var item = this.current;
+    if ((item !== undefined) && (item !== null) && item.has_id) {
+      this.error = null;
+      this.dataService.remove_one_item(item).then((r) => {
+        this.current = null;
+        this.refreshAll();
+      }, (err) => {
+          this.internal_set_error(err);
+        });
+    }// item
+  }// remove
   public get canSave(): boolean {
     return (this.current !== null) && this.current.is_storeable;
   }
+  public save(): void {
+    var item = this.current;
+    if ((item !== undefined) && (item !== null) && item.is_storeable) {
+      this.error = null;
+      this.dataService.maintains_one_item(item).then((r) => {
+        this.refresh();
+      }, (err) => {
+          this.internal_set_error(err);
+        });
+    }// item
+  }// save
   public addNew(): void {
     this.add_mode = true;
     this._oldItem = this.current;

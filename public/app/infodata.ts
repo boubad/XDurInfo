@@ -23,6 +23,13 @@ export interface IBaseItem {
   uniteid?:any;
   matiereid?:any;
   groupeid?:any;
+  startDate?:any;
+  endDate?:any;
+  genre?:string;
+  mat_module?:string;
+  coefficient?:number;
+  ecs?:number;
+  has_sigle?:boolean;
 }// interface IBaseItem
 export interface IDescriptionItem extends IBaseItem {
   remarks: string;

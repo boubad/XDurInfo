@@ -3,14 +3,14 @@
 import InfoData = require('../../infodata');
 import Departement = require('../domain/departement');
 import SigleNameViewModel = require('./siglenameviewmodel');
+import ItemDataManager = require('../services/itemdatamanager');
 //
 class DepartementSigleNameViewModel extends SigleNameViewModel {
   public departement: InfoData.IDepartement;
 
-  constructor(service: InfoData.IDataManager,
-    model: InfoData.IDepartementSigleNameItem) {
-    super(service, model);
-    this.departement = null;
+  constructor(model: InfoData.IDepartementSigleNameItem) {
+    super(model);
+    this.departement = new Departement();
   }
   public get departementid(): any {
     return ((this.departement !== undefined) && (this.departement !== null)) ?

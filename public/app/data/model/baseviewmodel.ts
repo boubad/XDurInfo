@@ -1,5 +1,7 @@
 //baseviewmodel.ts
 //
+declare var window;
+//
 import InfoData = require('../../infodata');
 import BaseItem = require('../domain/baseitem');
 import ItemDataManager = require('../services/itemdatamanager');
@@ -11,8 +13,8 @@ class BaseViewModel {
     public info:string;
     public menu:InfoData.IMenuDesc[];
     //
-    constructor(server:InfoData.IDataManager) {
-      this.dataService = server;
+    constructor() {
+      this.dataService = new ItemDataManager();
       this.title = null;
       this.error = null;
       this.info = null;
@@ -21,6 +23,9 @@ class BaseViewModel {
     //
     public update_menu():void {
       this.menu = [];
+    }
+    public ask_question(prompt:string):boolean{
+      return window.confirm(prompt);
     }
     //
     public check_date(d:Date) : Date {
