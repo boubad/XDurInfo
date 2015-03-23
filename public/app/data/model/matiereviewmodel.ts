@@ -7,59 +7,78 @@ import DepartementSigleNameViewModel = require('./departementsiglenameviewmodel'
 //
 class MatiereViewModel extends DepartementSigleNameViewModel {
   //
+  public genre:KnockoutComputed<string>;
+  public mat_module:KnockoutComputed<string>;
+  public coefficient:KnockoutComputed<number>;
+  public ecs:KnockoutComputed<number>;
+  //
   public unite: InfoData.IUnite;
   constructor() {
     super(new Matiere());
+    this.current(new Matiere());
     this.unite = new Unite();
-  }
-  public get genre(): string {
-    if ((this.current !== undefined) && (this.current !== null)) {
-      return this.current.genre;
-    } else {
-      return null;
-    }
-  }
-  public set genre(s: string) {
-    if ((this.current !== undefined) && (this.current !== null)) {
-      this.current.genre = s;
-    }
-  }
-  public get mat_module(): string {
-    if ((this.current !== undefined) && (this.current !== null)) {
-      return this.current.mat_module;
-    } else {
-      return null;
-    }
-  }
-  public set mat_module(s: string) {
-    if ((this.current !== undefined) && (this.current !== null)) {
-      this.current.mat_module = s;
-    }
-  }
-  public get coefficient(): number {
-    if ((this.current !== undefined) && (this.current !== null)) {
-      return this.current.coefficient;
-    } else {
-      return null;
-    }
-  }
-  public set coefficient(s: number) {
-    if ((this.current !== undefined) && (this.current !== null)) {
-      this.current.coefficient = s;
-    }
-  }
-  public get ecs(): number {
-    if ((this.current !== undefined) && (this.current !== null)) {
-      return this.current.ecs;
-    } else {
-      return null;
-    }
-  }
-  public set ecs(s: number) {
-    if ((this.current !== undefined) && (this.current !== null)) {
-      this.current.ecs = s;
-    }
-  }
+    this.title('Matières');
+    this.genre = ko.computed({
+      read: ()=>{
+        if ((this.current() !== undefined) && (this.current() !== null)) {
+          return this.current().genre;
+        } else {
+          return null;
+        }
+      },
+      write: (s) =>{
+        if ((this.current() !== undefined) && (this.current() !== null)) {
+          this.current().genre = s;
+        }
+      },
+      owner: this
+    });
+    this.mat_module = ko.computed({
+      read: ()=>{
+        if ((this.current() !== undefined) && (this.current() !== null)) {
+          return this.current().mat_module;
+        } else {
+          return null;
+        }
+      },
+      write: (s) =>{
+        if ((this.current() !== undefined) && (this.current() !== null)) {
+          this.current().mat_module = s;
+        }
+      },
+      owner: this
+    });
+    this.coefficient = ko.computed({
+      read: ()=>{
+        if ((this.current() !== undefined) && (this.current() !== null)) {
+          return this.current().coefficient;
+        } else {
+          return null;
+        }
+      },
+      write: (s) =>{
+        if ((this.current() !== undefined) && (this.current() !== null)) {
+          this.current().coefficient = s;
+        }
+      },
+      owner: this
+    });
+    this.ecs = ko.computed({
+      read: ()=>{
+        if ((this.current() !== undefined) && (this.current() !== null)) {
+          return this.current().ecs;
+        } else {
+          return null;
+        }
+      },
+      write: (s) =>{
+        if ((this.current() !== undefined) && (this.current() !== null)) {
+          this.current().ecs = s;
+        }
+      },
+      owner: this
+    });
+  }// constructor
   public get uniteid(): any {
     return ((this.unite !== undefined) && (this.unite !== null)) ?
       this.unite.id : null;
@@ -105,11 +124,11 @@ class MatiereViewModel extends DepartementSigleNameViewModel {
   }
   public addNew(): void {
     super.addNew();
-    this.current = this.dataService.create_item({
+    this.current(this.dataService.create_item({
       type: this.modelItem.type,
       uniteid: this.uniteid,
       departementid: this.departementid
-    });
+    }));
   }
 }// class MatiereViewModel
 export = MatiereViewModel;

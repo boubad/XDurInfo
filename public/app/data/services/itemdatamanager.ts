@@ -125,7 +125,7 @@ class ItemDataManager implements InfoData.IDataManager {
   private _perform_post(item: InfoData.IBaseItem): Q.IPromise<any> {
     var oMap = {};
     item.to_insert_map(oMap);
-    var url = item.collection_name;
+    var url = ItemDataManager.form_url(item.collection_name);
     return http.post(url, oMap);
   }// _perform_post
   //

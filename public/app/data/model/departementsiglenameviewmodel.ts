@@ -35,10 +35,10 @@ class DepartementSigleNameViewModel extends SigleNameViewModel {
   }
   public addNew(): void {
     super.addNew();
-    this.current = this.dataService.create_item({
+    this.current(this.dataService.create_item({
       type: this.modelItem.type,
       departementid: this.departementid
-    });
+    }));
   }
 
 }// class DepartementNameViewModel

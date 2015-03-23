@@ -5,6 +5,7 @@ declare var window;
 /// <reference path='../../../lib/typings/knockout/knockout.d.ts'/>
 //
 import ko = require('knockout');
+import app = require('durandal/app');
 import InfoData = require('../../infodata');
 import BaseItem = require('../domain/baseitem');
 import ItemDataManager = require('../services/itemdatamanager');
@@ -16,33 +17,32 @@ class BaseViewModel {
     public info:KnockoutObservable<string>;
     public menu:KnockoutObservableArray<InfoData.IMenuDesc>;
     //
+    public hasError:KnockoutComputed<boolean>;
+    public hasInfo:KnockoutComputed<boolean>;
+    //
     constructor() {
       this.dataService = new ItemDataManager();
       this.title = ko.observable(null);
       this.error = ko.observable(null);
       this.info = ko.observable(null);
       this.menu = ko.observableArray([]);
+      this.hasError = ko.computed(()=>{
+        return ((this.error() !== null) &&
+        this.error().trim().length > 0);
+      },this);
+      this.hasInfo = ko.computed(()=>{
+        return ((this.info() !== null) &&
+        this.info().trim().length > 0);
+      },this);
     }// constructor
     //
-    public hasError():boolean {
-      return ((this.error() !== null) &&
-      this.error().trim().length > 0);
-    }
-    public hasInfo():boolean {
-      return ((this.info() !== null) &&
-      this.info().trim().length > 0);
-    }
-    //
     public update_menu():void {
-      this.menu = ko.observableArray([]);
+      this.menu([]);
     }
     public update_title(): void {
     }// update_title
     public ask_question(prompt:string):boolean{
       return window.confirm(prompt);
-    }
-    public perform_conditionally(message:string, oper:()=>any) {
-
     }
     //
     public check_date(d:Date) : Date {

@@ -25,7 +25,7 @@
   </div>
   <div class="row">
     <div data-bind="visible: hasItems" class="col-xs-4">
-      <div data-bind="visible: hasPage">
+      <div data-bind="visible: hasPages">
         <ul class="pager">
           <li>
             <a data-bind="attr:{visible: canPrevPage, click: firstPage, href: '#'}">Début</a>
@@ -47,6 +47,14 @@
       <form role="form">
         <select class="form-control" data-bind="options: items, optionsText: 'name', value: current" size="16" />
       </form>
+    <!--
+    <ul data-bind="foreach: items">
+      <li>
+        <a data-bind="attr: {click: select, href='#'}"><span data-bind="text: sigle"></span></a>
+        <span text=" " /><span data-bind="text: name"></span>
+      </li>
+    </ul>
+  -->
     </div>
     <div class="col-xs-6">
       <div>
@@ -63,7 +71,7 @@
         </div>
         <div class="form-group">
           <label for="rem">Description:</label>
-          <textarea id="rem" data-bind="value:description" rows="6" placeholder="Description"></textarea>
+          <textarea id="rem" data-bind="value:remarks" placeholder="Description"></textarea>
         </div>
         <div class="btn-group">
           <button type="button" class="btn btn-primary" data-bind="visible: canAdd, click: addNew">Nouveau</button>

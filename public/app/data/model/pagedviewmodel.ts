@@ -63,12 +63,8 @@ class PagedViewModel extends BaseViewModel {
       owner: this
     });
     this.hasCurrent = ko.computed(() => {
-      return ((this.current() !== undefined) && (this.current() !== null) &&
-        this.current().has_id);
-    }, this);
-    this.add_mode = ko.computed(() => {
-      return ((this.current() !== undefined) && (this.current() !== null) &&
-        this.current().has_id);
+      var v = this.current();
+      return ((v !== undefined) && (v !== null) && (v.id !== undefined) && (v.id !== null));
     }, this);
     this.canAdd = ko.computed(() => {
       return (!this.add_mode());
@@ -77,10 +73,13 @@ class PagedViewModel extends BaseViewModel {
       return this.add_mode();
     }, this);
     this.canRemove = ko.computed(() => {
-      return ((this.current() !== null) && this.current().has_id);
+      var v = this.current();
+      return ((v !== undefined) && (v !== null) && (v.id !== undefined) && (v.id !== null));
     }, this);
     this.canSave = ko.computed(() => {
-      return (this.current() !== null) && this.current().is_storeable;
+      var v = this.current();
+      return ((v !== undefined) && (v !== null) && (v.is_storeable !== undefined) &&
+      (v.is_storeable !== null));
     }, this);
     this.currentPage = ko.computed({
       read: () => {
@@ -107,18 +106,6 @@ class PagedViewModel extends BaseViewModel {
       },
       owner: this
     });
-    this.itemsCount = ko.computed({
-      read: () => {
-        return this.itemsCount();
-      },
-      write: (n) => {
-        if ((n !== undefined) && (n !== null) && (n > 0) && (n != this._itemsPerPage())) {
-          this._itemsPerPage(n);
-          this._internal_pages_setup();
-        }
-      },
-      owner: this
-    });
     this.hasItems = ko.computed(() => {
       return (this.itemsCount() > 0);
     }, this);
@@ -136,23 +123,27 @@ class PagedViewModel extends BaseViewModel {
   //
   public change_current(s: InfoData.IBaseItem) {
     this._current_item(s);
-    this.error(null);
+    //this.error(null);
     this.update_menu();
   }
-
+  public select(s:InfoData.IBaseItem){
+    this.change_current(s);
+  }
   public remove(): void {
-    var item = this.current;
-    if ((item !== undefined) && (item !== null) && item().has_id) {
+    var item = this.current();
+    if ((item !== undefined) && (item !== null) && (item.id !== undefined) &&
+    (item.id !== null)) {
       var message = "Voulez-vous vraiment supprimer?";
-      this.perform_conditionally(message, this.perform_remove);
+      if (this.ask_question(message)){
+        this.perform_remove();
+      }
     }
   }// remove
   public perform_remove(): void {
     var item = this.current();
-    if ((item !== undefined) && (item !== null) && item.has_id) {
-      this.error = null;
+    if ((item !== undefined) && (item !== null) && (item.id !== undefined) &&
+    (item.id !== null)) {
       this.dataService.remove_one_item(item).then((r) => {
-        this.current = null;
         this.refreshAll();
       }, (err) => {
           this.internal_set_error(err);
@@ -188,21 +179,22 @@ class PagedViewModel extends BaseViewModel {
     if (start < 0) {
       start = 0;
     }
-    this.error = null;
+    this.error(null);
     var old = this._oldItem;
     this.items([]);
-    this._current_item(this.dataService.create_item({ type: model.type }));
+    this._current_item(this.dataService.create_item({ type: this.modelItem.type }));
     this.pageStatus(null);
     var service = this.dataService;
     var model = this.modelItem;
-    return service.get_items(model).then((dd) => {
+    return service.get_items(model,start,count).then((dd) => {
       this.add_mode(false);
       this.items(dd);
       if (this.pagesCount() > 0) {
         var n = this._currentPage() + 1;
         this.pageStatus('Page ' + n + ' sur ' + this.pagesCount());
       }
-      if ((old !== null) && old.has_id && (dd !== undefined) && (dd !== null) && (dd.length > 0)) {
+      if ((old !== undefined) && (old !== null) && (old.id !== undefined) &&
+      (old.id !== null) && (dd !== undefined) && (dd !== null) && (dd.length > 0)) {
         var id = old.id;
         var pSel: InfoData.IBaseItem = null;
         for (var i = 0; i < dd.length; ++i) {
@@ -213,8 +205,11 @@ class PagedViewModel extends BaseViewModel {
           }
         }// i
         if (pSel !== null) {
-          this.current(pSel);
+          this._current_item(pSel);
         }
+      }
+      if (dd.length < 1){
+        this.addNew();
       }
     }, (err) => {
         return this.internal_set_error(err);
@@ -233,8 +228,9 @@ class PagedViewModel extends BaseViewModel {
       nc = 16;
       this._itemsPerPage(nc);
     }
+    var np = 0;
     if (nt > 0) {
-      var np = Math.floor(nt / nc);
+      np = Math.floor(nt / nc);
       if ((nt % nc) > 0) {
         ++np;
       }
@@ -251,13 +247,38 @@ class PagedViewModel extends BaseViewModel {
   }// _internal_pages_setup
 
   public refreshAll(): any {
-    return this.dataService.get_items_count(this.modelItem).then((n) => {
-      this.itemsCount(n);
-      this._internal_pages_setup();
+    return this.dataService.get_items_count(this.modelItem).then((nt) => {
+      if ((nt == undefined) || (nt == null)){
+        nt = 0;
+      }
+      this.itemsCount(nt);
+      this._currentPage(0);
+      var nc = this._itemsPerPage();
+      if (nc < 1) {
+        nc = 16;
+        this._itemsPerPage(nc);
+      }
+      var np = 0;
+      if (nt > 0) {
+        np = Math.floor(nt / nc);
+        if ((nt % nc) > 0) {
+          ++np;
+        }
+        this.pagesCount(np);
+      }// nt
+      if (np > 0) {
+        return this.refresh();
+      } else {
+        this.items([]);
+        this._current_item(this.dataService.create_item({ type: this.modelItem.type }));
+        this.pageStatus(null);
+        return true;
+      }
     }, (err) => {
         this.internal_set_error(err);
         this.itemsCount(0);
         this._internal_pages_setup();
+        return true;
       });
   }// refreshAll
 
@@ -270,7 +291,7 @@ class PagedViewModel extends BaseViewModel {
   public nextPage(): void {
     this.currentPage(this.currentPage() + 1);
   }
-  public lastage(): void {
+  public lastPage(): void {
     this.currentPage(this.pagesCount() - 1);
   }
 }// class PagetViewModel
