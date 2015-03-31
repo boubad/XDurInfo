@@ -30,3 +30,5 @@ bower_components
 dataserver/**/*.js
 public/app/data/**/*.js
 public/app/viewmodels/**/*.js
+.c9
+.zedstate

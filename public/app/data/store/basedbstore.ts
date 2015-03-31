@@ -99,7 +99,65 @@ class BaseDBStore extends ItemGenerator {
         });
       }
     });
-  }//maintains_one_item
+  }//get_one_item
+  //
+  get_items(item:InfoData.IBaseItem, indexname?:string,
+  skip?:number, limit?:number): Q.IPromise<InfoData.IBaseItem[]> {
+    var offset = ((skip !== undefined) && (skip !== null) && (skip >= 0)) ? 
+    skip : 0;
+    var count = ((limit !== undefined) && (limit !== null) && (limit > 0)) ?
+    limit : 16;
+    return Q.Promise((resolve, reject) => {
+      this.open().then((db)=>{
+        var res = [];
+        var pos = 0;
+         var transaction = db.transaction([item.collection_name]);
+          transaction.oncomplete = (evt)=>{
+            resolve(res);
+          };
+          transaction.onerror = (evt) => {
+            reject(new Error(transaction.error.name));
+          };
+          var store = transaction.objectStore(colname);
+        if ((indexname !== undefined) && (indexname !== null)){
+         var index = store.index(indexname);
+         var cc = index.openCursor();
+         cc.onsuccess = (evt) =>{
+            var cursor = cc.result;
+            if ((cursor !== undefined) && (cursor !== null)){
+              if (pos >= start){
+                 var x = this.create_item(cursor);
+                 if (x !== null){
+                   res.push(x);
+                 }
+              }
+              ++pos;
+              if (res.length < count){
+                cc.continue();
+              } 
+            } 
+         };
+      }else {
+        var cc = store.openCursor();
+         cc.onsuccess = (evt) =>{
+            var cursor = cc.result;
+            if ((cursor !== undefined) && (cursor !== null)){
+              if (pos >= start){
+                 var x = this.create_item(cursor);
+                 if (x !== null){
+                   res.push(x);
+                 }
+              }
+              ++pos;
+              if (res.length < count){
+                cc.continue();
+              } 
+            } 
+         };
+      }
+      });
+    });
+  }//get_items
   //
   register_one_item(item: InfoData.IBaseItem): Q.IPromise<any> {
     return Q.Promise((resolve, reject) => {
