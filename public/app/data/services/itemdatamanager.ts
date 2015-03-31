@@ -1,6 +1,7 @@
 //itemdatamabager.ts
 //
 import http = require('plugins/http');
+import Q = require('q');
 //
 import InfoData = require('../../infodata');
 import BaseItem = require('../domain/baseitem');
@@ -22,6 +23,8 @@ import EtudAffectation = require('../domain/etudaffectation');
 import GroupeEvent = require('../domain/groupeevent');
 import EtudEvent = require('../domain/etudevent');
 import AttachedDoc = require('../domain/attacheddoc');
+import Operator = require('../domain/operator');
+import Administrator = require('../domain/administrator');
 //
 //
 class ItemDataManager implements InfoData.IDataManager {
@@ -74,6 +77,10 @@ class ItemDataManager implements InfoData.IDataManager {
       return new EtudEvent(oMap);
     } else if (t == 'attacheddoc') {
       return new AttachedDoc(oMap);
+    }else if (t == 'operator') {
+      return new Operator(oMap);
+    }else if (t == 'administrator') {
+      return new Administrator(oMap);
     }
     return null;
   }// create_item
@@ -160,7 +167,7 @@ class ItemDataManager implements InfoData.IDataManager {
       var n = dd.length;
       for (var i = 0; i < n; ++i) {
         var x = self.create_item(dd[i]);
-        if (x != null) {
+        if (x !== null) {
           vRet.push(x);
         }
       }// i
@@ -186,7 +193,18 @@ class ItemDataManager implements InfoData.IDataManager {
       return vRet;
     });
   }// get_by_id
-
+  public get_items_array(item:InfoData.IBaseItem, ids:any[]) : Q.IPromise<InfoData.IBaseItem[]>{
+      if ((ids === undefined) || (ids === null) || (ids.length < 1)){
+        return Q.resolve([]);
+      }
+      var pp = [];
+      var type = item.type;
+      for (var i = 0; i < ids.length; ++i){
+         var model = this.create_item({_id: ids[i], type: type});
+         pp.push(this.get_by_id(model));
+      }// i
+      return Q.all(pp);
+  }// get_items_array
   public insert_one_item(item: InfoData.IBaseItem): Q.IPromise<any> {
     return this._perform_post(item);
   }

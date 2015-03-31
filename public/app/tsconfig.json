@@ -14,6 +14,7 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./data/domain/administrator.ts",
         "./data/domain/adminperson.ts",
         "./data/domain/affectation.ts",
         "./data/domain/annee.ts",
@@ -35,6 +36,7 @@
         "./data/domain/groupeevent.ts",
         "./data/domain/intervalitem.ts",
         "./data/domain/matiere.ts",
+        "./data/domain/operator.ts",
         "./data/domain/operperson.ts",
         "./data/domain/person.ts",
         "./data/domain/profaffectation.ts",
@@ -53,6 +55,7 @@
         "./data/model/semestreviewmodel.ts",
         "./data/model/siglenameviewmodel.ts",
         "./data/model/uniteviewmodel.ts",
+        "./data/model/userinfo.ts",
         "./data/services/infohttpmanager.ts",
         "./data/services/itemdatamanager.ts",
         "./data/test/baseitem-test.ts",
@@ -62,6 +65,7 @@
         "./infodata.ts",
         "./viewmodels/departements.ts",
         "./viewmodels/flickr.ts",
+        "./viewmodels/groupes.ts",
         "./viewmodels/shell.ts",
         "./viewmodels/welcome.ts",
         "../lib/typings/durandal/durandal.d.ts",

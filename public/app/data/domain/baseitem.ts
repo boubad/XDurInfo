@@ -10,6 +10,8 @@ class BaseItem implements InfoData.IBaseItem {
   private _rev: any;
   //
   constructor(oMap?: any) {
+    this._id = null;
+    this._rev = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap._id !== undefined) {
         this.id = oMap._id;
@@ -53,23 +55,21 @@ class BaseItem implements InfoData.IBaseItem {
     return sRet;
   }// date_to_string
   public get id(): any {
-    return ((this._id !== undefined) && (this._id !== null) &&
-      (this._id.toString().trim().length > 0)) ?
-      this._id : null;
+    return this._id;
   }
   public set id(s: any) {
-    this._id = s;
+    this._id = ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) ?
+    s : null;
   }
   public get has_id(): boolean {
     return (this.id !== null);
   }
   public get rev(): any {
-    return ((this._rev !== undefined) && (this._rev !== null) &&
-      (this._rev.toString().trim().length > 0)) ?
-      this._rev : null;
+    return this._rev;
   }
   public set rev(s: any) {
-    this._rev = s;
+    this._rev =  ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) ?
+    s : null;
   }
   public get has_rev(): boolean {
     return (this.rev !== null);
@@ -90,18 +90,12 @@ class BaseItem implements InfoData.IBaseItem {
     return (this.type !== null) && (this.collection_name !== null);
   }
   public to_insert_map(oMap: any): void {
-    if (this.has_type) {
       oMap.type = this.type;
-    }
   }
   public to_fetch_map(oMap: any): void {
     this.to_insert_map(oMap);
-    if (this.has_id) {
-      oMap._id = this.id;
-    }
-    if (this.has_rev) {
-      oMap._rev = this.rev;
-    }
+    oMap._id = this.id;
+    oMap._rev = this.rev;
   }
   public toString(): string {
     var oMap = {};

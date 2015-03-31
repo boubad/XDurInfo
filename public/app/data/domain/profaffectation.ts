@@ -10,6 +10,9 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._profid = null;
+    this._uniteid = null;
+    this._matiereid = null;
     if ((oMap != undefined) && (oMap != null)) {
       if (oMap.enseignantid != undefined) {
         this.enseignantid = oMap.enseignantid;
@@ -24,7 +27,7 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
   }// constructor
   //
   public get matiereid(): any {
-    return (this._matiereid != undefined) ? this._matiereid : null;
+    return this._matiereid;
   }
   public set matiereid(s: any) {
     if ((s != undefined) && (s != null) && (s.toString().trim().length > 0)) {
@@ -38,7 +41,7 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
   }
   //
   public get uniteid(): any {
-    return (this._uniteid != undefined) ? this._uniteid : null;
+    return this._uniteid;
   }
   public set uniteid(s: any) {
     if ((s != undefined) && (s != null) && (s.toString().trim().length > 0)) {
@@ -52,7 +55,7 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
   }
   //
   public get enseignantid(): any {
-    return (this._profid != undefined) ? this._profid : null;
+    return this._profid;
   }
   public set enseignantid(s: any) {
     if ((s != undefined) && (s != null) && (s.toString().trim().length > 0)) {
@@ -80,15 +83,9 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_enseignantid) {
       oMap.enseignantid = this.enseignantid;
-    }
-    if (this.has_uniteid) {
       oMap.uniteid = this.uniteid;
-    }
-    if (this.has_matiereid) {
       oMap.matiereid = this.matiereid;
-    }
   }// to_insert_map
   public get type(): string {
     return 'profaffectation';

@@ -1,23 +1,27 @@
 //affectation.ts
 import InfoData = require('../../infodata');
 //
-import DescriptionItem = require('./descriptionitem');
+import BaseItem = require('./baseitem');
+import DepartementChild = require('./departementchild');
 //
-class Affectation extends DescriptionItem implements InfoData.IAffectation {
-  private _departementid: any;
+class Affectation extends DepartementChild implements InfoData.IAffectation {
   private _anneeid:any;
   private _semestreid: any;
   private _groupeid: any;
   private _personid: any;
   private _start: Date;
   private _end: Date;
+  private _fullname: string;
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._anneeid = null;
+    this._semestreid = null;
+    this._groupeid = null;
+    this._personid = null;
+    this._start = null;
+    this._end = null;
     if ((oMap !== undefined) && (oMap !== null)) {
-      if (oMap.departementid !== undefined) {
-        this.departementid = oMap.departementid;
-      }
       if (oMap.anneeid !== undefined) {
         this.anneeid = oMap.anneeid;
       }
@@ -36,30 +40,43 @@ class Affectation extends DescriptionItem implements InfoData.IAffectation {
       if (oMap.endDate !== undefined) {
         this.endDate = oMap.endDate;
       }
+      if (oMap.fullname !== undefined){
+        this.fullname = oMap.fullname;
+      }
     }// oMap
   }// constructor
+  public get fullname(): string {
+    return this._fullname;
+  }
+  public set fullname(s:string){
+      this._fullname = ((s !== undefined) && (s !== null) &&
+      (s.trim().length > 0)) ? s.trim() : null;
+  }
+  public get has_fullname():boolean {
+    return (this.fullname !== null);
+  }
   //
   public get startDate(): Date {
-    return (this._start !== undefined) ? this._start : null;
+    return this._start;
   }
   public set startDate(d: Date) {
-    this._start = (d !== undefined) ? d : null;
+    this._start = BaseItem.check_date(d);
   }
   public get has_startDate(): boolean {
     return (this.startDate !== null);
   }
   public get endDate(): Date {
-    return (this._end !== undefined) ? this._end : null;
+    return this._end;
   }
   public set endDate(d: Date) {
-    this._end = (d !== undefined) ? d : null;
+    this._end = BaseItem.check_date(d);
   }
   public get has_endDate(): boolean {
     return (this.endDate !== null);
   }
   //
   public get personid(): any {
-    return (this._personid !== undefined) ? this._personid : null;
+    return this._personid;
   }
   public set personid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -74,7 +91,7 @@ class Affectation extends DescriptionItem implements InfoData.IAffectation {
   //
   //
   public get groupeid(): any {
-    return (this._groupeid !== undefined) ? this._groupeid : null;
+    return this._groupeid;
   }
   public set groupeid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -89,7 +106,7 @@ class Affectation extends DescriptionItem implements InfoData.IAffectation {
   //
   //
   public get anneeid(): any {
-    return (this._anneeid !== undefined) ? this._anneeid : null;
+    return this._anneeid;
   }
   public set anneeid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -104,7 +121,7 @@ class Affectation extends DescriptionItem implements InfoData.IAffectation {
   //
   //
   public get semestreid(): any {
-    return (this._semestreid !== undefined) ? this._semestreid : null;
+    return this._semestreid;
   }
   public set semestreid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -117,47 +134,20 @@ class Affectation extends DescriptionItem implements InfoData.IAffectation {
     return (this.semestreid !== null);
   }
   //
-  public get departementid(): any {
-    return (this._departementid !== undefined) ? this._departementid : null;
-  }
-  public set departementid(s: any) {
-    if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
-      this._departementid = s;
-    } else {
-      this._departementid = null;
-    }
-  }
-  public get has_departementid(): boolean {
-    return (this.departementid !== null);
-  }
-  //
   public get is_storeable(): boolean {
     return (this.type !== null) && (this.collection_name !== null) &&
-      this.has_departementid;
+      (this.departementid !== null);
   }
   public to_insert_map(oMap: any) : void {
     super.to_insert_map(oMap);
-    if (this.has_departementid) {
       oMap.departementid = this.departementid;
-    }
-    if (this.has_anneeid) {
       oMap.anneeid = this.anneeid;
-    }
-    if (this.has_semestreid) {
       oMap.semestreid = this.semestreid;
-    }
-    if (this.has_groupeid) {
       oMap.groupeid = this.groupeid;
-    }
-    if (this.has_personid) {
       oMap.personid = this.personid;
-    }
-    if (this.has_startDate) {
       oMap.startDate = this.startDate;
-    }
-    if (this.has_endDate) {
       oMap.endDate = this.endDate;
-    }
+      oMap.fullname = this.fullname;
   }// to_insert_map
 }// class Affectation
 export = Affectation;

@@ -21,7 +21,7 @@ class PagedViewModel extends BaseViewModel {
   private _currentPage: KnockoutObservable<number>;
   public add_mode: KnockoutObservable<boolean>;
   //
-  public hasStatus: KnockoutComputed<boolean>;
+  public hasPageStatus: KnockoutComputed<boolean>;
   public current: KnockoutComputed<InfoData.IBaseItem>;
   public hasCurrent: KnockoutComputed<boolean>;
   public canAdd: KnockoutComputed<boolean>;
@@ -50,14 +50,14 @@ class PagedViewModel extends BaseViewModel {
     this._currentPage = ko.observable(0);
     this.add_mode = ko.observable(false);
     //
-    this.hasStatus = ko.computed(() => {
+    this.hasPageStatus = ko.computed(() => {
       return (this.pageStatus() != null);
     }, this);
     this.current = ko.computed({
       read: () => {
         return this._current_item();
       },
-      write: (s) => {
+      write: (s:InfoData.IBaseItem) => {
         this.change_current(s);
       },
       owner: this
@@ -85,7 +85,7 @@ class PagedViewModel extends BaseViewModel {
       read: () => {
         return this._currentPage();
       },
-      write: (n) => {
+      write: (n : number) => {
         if ((n !== undefined) && (n !== null) && (n >= 0) && (n < this.pagesCount()) &&
           (this._currentPage() != n)) {
           this._currentPage(n);
@@ -98,7 +98,7 @@ class PagedViewModel extends BaseViewModel {
       read: () => {
         return this._itemsPerPage();
       },
-      write: (n) => {
+      write: (n: number) => {
         if ((n !== undefined) && (n !== null) && (n > 0) && (n != this._itemsPerPage())) {
           this._itemsPerPage(n);
           this._internal_pages_setup();
@@ -121,9 +121,14 @@ class PagedViewModel extends BaseViewModel {
     }, this);
   }// constructor
   //
+   public create_item() : InfoData.IBaseItem {
+     var p = this.dataService.create_item({ type: this.modelItem.type });
+     return p;
+   }// create_item
+  //
   public change_current(s: InfoData.IBaseItem) {
     this._current_item(s);
-    //this.error(null);
+    this.error(null);
     this.update_menu();
   }
   public select(s:InfoData.IBaseItem){
@@ -162,9 +167,10 @@ class PagedViewModel extends BaseViewModel {
     }// item
   }// save
   public addNew(): void {
+    this.error(null);
     this.add_mode(true);
     this._oldItem = this.current();
-    this.current(this.dataService.create_item({ type: this.modelItem.type }));
+    this.current(this.create_item());
   }
   public cancel(): void {
     this.add_mode(false);
@@ -182,7 +188,7 @@ class PagedViewModel extends BaseViewModel {
     this.error(null);
     var old = this._oldItem;
     this.items([]);
-    this._current_item(this.dataService.create_item({ type: this.modelItem.type }));
+    this._current_item(this.create_item());
     this.pageStatus(null);
     var service = this.dataService;
     var model = this.modelItem;
@@ -221,12 +227,10 @@ class PagedViewModel extends BaseViewModel {
     var nt = this.itemsCount();
     if (nt < 1) {
       nt = 0;
-      this.itemsCount(nt);
     }
     var nc = this._itemsPerPage();
     if (nc < 1) {
       nc = 16;
-      this._itemsPerPage(nc);
     }
     var np = 0;
     if (nt > 0) {
@@ -240,7 +244,7 @@ class PagedViewModel extends BaseViewModel {
       return this.refresh();
     } else {
       this.items([]);
-      this._current_item(this.dataService.create_item({ type: this.modelItem.type }));
+      this._current_item(this.create_item());
       this.pageStatus(null);
       return true;
     }
@@ -248,38 +252,12 @@ class PagedViewModel extends BaseViewModel {
 
   public refreshAll(): any {
     return this.dataService.get_items_count(this.modelItem).then((nt) => {
-      if ((nt == undefined) || (nt == null)){
+      if ((nt === undefined) || (nt === null)){
         nt = 0;
-      }
-      this.itemsCount(nt);
-      this._currentPage(0);
-      var nc = this._itemsPerPage();
-      if (nc < 1) {
-        nc = 16;
-        this._itemsPerPage(nc);
-      }
-      var np = 0;
-      if (nt > 0) {
-        np = Math.floor(nt / nc);
-        if ((nt % nc) > 0) {
-          ++np;
-        }
-        this.pagesCount(np);
-      }// nt
-      if (np > 0) {
-        return this.refresh();
-      } else {
-        this.items([]);
-        this._current_item(this.dataService.create_item({ type: this.modelItem.type }));
-        this.pageStatus(null);
-        return true;
-      }
-    }, (err) => {
-        this.internal_set_error(err);
-        this.itemsCount(0);
-        this._internal_pages_setup();
-        return true;
-      });
+       }
+       this.itemsCount(nt);
+       return this._internal_pages_setup();
+     });
   }// refreshAll
 
   public firstPage(): void {

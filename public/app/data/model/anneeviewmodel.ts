@@ -16,5 +16,12 @@ class AnneeViewModel extends IntervalViewModel {
     }
     this.menu(mm);
   }// update_menu
+  public update_title(): void {
+    var s = 'Années';
+    if (this.departement() !== null){
+      s = s + ' ' + this.departement().name;
+    }
+    this.title(s);
+  }// update_title
 }// class AnneeViewModel
 export = AnneeViewModel;

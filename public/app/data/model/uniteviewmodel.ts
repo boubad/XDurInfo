@@ -17,5 +17,12 @@ class UniteViewModel extends DepartementSigleNameViewModel {
     }
     this.menu(mm);
   }// update_menu
+  public update_title(): void {
+    var s = 'Unités';
+    if (this.departement() !== null){
+      s = s + ' ' + this.departement().name;
+    }
+    this.title(s);
+  }// update_title
 }// class UniteViewModel
 export = UniteViewModel;

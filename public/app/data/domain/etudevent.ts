@@ -14,6 +14,10 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._aff = null;
+    this._evt = null;
+    this._note = null;
+    this._etud = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.etudaffectationid !== undefined) {
         this.etudaffectationid = oMap.etudaffectationid;
@@ -37,7 +41,7 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
   }
   //
   public get etudaffectationid(): any {
-    return (this._aff !== undefined) ? this._aff : null;
+    return this._aff;
   }
   public set etudaffectationid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -51,7 +55,7 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
   }
   //
   public get groupeeventid(): any {
-    return (this._evt !== undefined) ? this._evt : null;
+    return this._evt;
   }
   public set groupeeventid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -65,7 +69,7 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
   }
   //
   public get etudiantid(): any {
-    return (this._etud !== undefined) ? this._etud : null;
+    return this._etud;
   }
   public set etudiantid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -79,7 +83,7 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
   }
   //
   public get note(): number {
-    return (this._note !== undefined) ? this._note : null;
+    return this._note;
   }
   public set note(s: number) {
     if ((s !== undefined) && (s !== null)) {
@@ -101,18 +105,10 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_etudaffectationid) {
       oMap.etudaffectationid = this.etudaffectationid;
-    }
-    if (this.has_groupeeventid) {
       oMap.groupeeventid = this.groupeeventid;
-    }
-    if (this.has_etudiantid) {
       oMap.etudiantid = this.etudiantid;
-    }
-    if (this.has_note) {
       oMap.note = this.note;
-    }
   }// to_insert_map
 }// class EtudEvent
 export = EtudEvent;

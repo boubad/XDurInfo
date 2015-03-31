@@ -1,9 +1,11 @@
 //matiereviewmodel.ts
+import ko = require('knockout');
 import InfoData = require('../../infodata');
 import Departement = require('../domain/departement');
 import Unite = require('../domain/annee');
 import Matiere = require('../domain/semestre');
 import DepartementSigleNameViewModel = require('./departementsiglenameviewmodel');
+import userInfo = require('./userinfo');
 //
 class MatiereViewModel extends DepartementSigleNameViewModel {
   //
@@ -12,12 +14,20 @@ class MatiereViewModel extends DepartementSigleNameViewModel {
   public coefficient:KnockoutComputed<number>;
   public ecs:KnockoutComputed<number>;
   //
-  public unite: InfoData.IUnite;
+  public unite: KnockoutComputed<InfoData.IUnite>;
   constructor() {
     super(new Matiere());
     this.current(new Matiere());
-    this.unite = new Unite();
     this.title('Matières');
+    this.unite =  ko.computed({
+      read: ()=>{
+        return userInfo.unite();
+      },
+      write : (s: InfoData.IUnite) =>{
+        userInfo.unite(s);
+      },
+      owner: this
+    });
     this.genre = ko.computed({
       read: ()=>{
         if ((this.current() !== undefined) && (this.current() !== null)) {
@@ -26,7 +36,7 @@ class MatiereViewModel extends DepartementSigleNameViewModel {
           return null;
         }
       },
-      write: (s) =>{
+      write: (s:string) =>{
         if ((this.current() !== undefined) && (this.current() !== null)) {
           this.current().genre = s;
         }
@@ -41,7 +51,7 @@ class MatiereViewModel extends DepartementSigleNameViewModel {
           return null;
         }
       },
-      write: (s) =>{
+      write: (s:string) =>{
         if ((this.current() !== undefined) && (this.current() !== null)) {
           this.current().mat_module = s;
         }
@@ -56,7 +66,7 @@ class MatiereViewModel extends DepartementSigleNameViewModel {
           return null;
         }
       },
-      write: (s) =>{
+      write: (s:number) =>{
         if ((this.current() !== undefined) && (this.current() !== null)) {
           this.current().coefficient = s;
         }
@@ -71,7 +81,7 @@ class MatiereViewModel extends DepartementSigleNameViewModel {
           return null;
         }
       },
-      write: (s) =>{
+      write: (s:number) =>{
         if ((this.current() !== undefined) && (this.current() !== null)) {
           this.current().ecs = s;
         }
@@ -80,15 +90,15 @@ class MatiereViewModel extends DepartementSigleNameViewModel {
     });
   }// constructor
   public get uniteid(): any {
-    return ((this.unite !== undefined) && (this.unite !== null)) ?
-      this.unite.id : null;
+    return ((this.unite() !== undefined) && (this.unite() !== null)) ?
+      this.unite().id : null;
   }
   public set uniteid(id: any) {
     if ((id !== undefined) && (id !== null) && (id.toString().length > 0)) {
       var model = new Unite();
       model.id = id;
       this.dataService.get_one_item(model).then((d: Unite) => {
-        this.unite = d;
+        this.unite(d);
         if ((d !== undefined) && (d !== null)) {
           this.modelItem.uniteid = d.id;
           this.modelItem.departementid = d.departementid;
@@ -96,30 +106,10 @@ class MatiereViewModel extends DepartementSigleNameViewModel {
           this.departementid = d.departementid;
         }
       }, (err) => {
-          this.unite = null;
+          this.unite(null);
         });
     } else {
-      this.unite = null;
-    }
-  }
-  public get departementid(): any {
-    return ((this.departement !== undefined) && (this.departement !== null)) ?
-      this.departement.id : null;
-  }
-  public set departementid(id: any) {
-    if ((id !== undefined) && (id !== null) && (id.toString().length > 0)) {
-      var model = new Departement();
-      model.id = id;
-      this.dataService.get_one_item(model).then((d: Departement) => {
-        this.departement = d;
-        if ((d !== undefined) && (d !== null)) {
-          this.modelItem.departementid = d.id;
-        }
-      }, (err) => {
-          this.departement = null;
-        });
-    } else {
-      this.departement = null;
+      this.unite(null);
     }
   }
   public addNew(): void {

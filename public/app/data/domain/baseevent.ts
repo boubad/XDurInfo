@@ -2,11 +2,10 @@
 import InfoData = require('../../infodata');
 //
 import BaseItem = require('./baseitem');
-import DescriptionItem = require('./descriptionitem');
+import DepartementChild = require('./departementchild');
 //
-class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
+class BaseEvent extends DepartementChild implements InfoData.IBaseEvent {
   //
-  private _departementid: any;
   private _anneeid: any;
   private _semestreid: any;
   private _groupeid: any;
@@ -20,10 +19,17 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._anneeid = null;
+    this._semestreid = null;
+    this._groupeid = null;
+    this._personid = null;
+    this._date = null;
+    this._uniteid = null;
+    this._matiereid = null;
+    this._genre = null;
+    this._docs = [];
+    this._status = null;
     if ((oMap !== undefined) && (oMap !== null)) {
-      if (oMap.departementid !== undefined) {
-        this.departementid = oMap.departementid;
-      }
       if (oMap.anneeid !== undefined) {
         this.anneeid = oMap.anneeid;
       }
@@ -59,7 +65,8 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }// constructor
   //
   public get documentids(): any[] {
-    return (this._docs !== undefined) ? this._docs : null;
+    return ((this._docs !== undefined) && (this._docs !== null)) ?
+     this._docs : [];
   }
   public set documentids(s: any[]) {
     if ((s !== undefined) && (s !== null) && (s.length > 0)) {
@@ -91,7 +98,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get status(): string {
-    return (this._status !== undefined) ? this._status : null;
+    return this._status;
   }
   public set status(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -105,7 +112,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get genre(): string {
-    return (this._genre !== undefined) ? this._genre : null;
+    return this._genre;
   }
   public set genre(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -119,7 +126,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get date(): Date {
-    return (this._date !== undefined) ? this._date : null;
+    return this._date;
   }
   public set date(d: Date) {
     this._date = BaseItem.check_date(d);
@@ -129,7 +136,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get matiereid(): any {
-    return (this._matiereid !== undefined) ? this._matiereid : null;
+    return this._matiereid;
   }
   public set matiereid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -143,7 +150,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get uniteid(): any {
-    return (this._uniteid !== undefined) ? this._uniteid : null;
+    return this._uniteid;
   }
   public set uniteid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -157,7 +164,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get personid(): any {
-    return (this._personid !== undefined) ? this._personid : null;
+    return this._personid;
   }
   public set personid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -171,7 +178,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get groupeid(): any {
-    return (this._groupeid !== undefined) ? this._groupeid : null;
+    return this._groupeid;
   }
   public set groupeid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -185,7 +192,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get anneeid(): any {
-    return (this._anneeid !== undefined) ? this._anneeid : null;
+    return this._anneeid;
   }
   public set anneeid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -199,7 +206,7 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   //
   public get semestreid(): any {
-    return (this._semestreid !== undefined) ? this._semestreid : null;
+    return this._semestreid;
   }
   public set semestreid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -212,20 +219,6 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
     return (this.semestreid !== null);
   }
   //
-  public get departementid(): any {
-    return (this._departementid !== undefined) ? this._departementid : null;
-  }
-  public set departementid(s: any) {
-    if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
-      this._departementid = s;
-    } else {
-      this._departementid = null;
-    }
-  }
-  public get has_departementid(): boolean {
-    return (this.departementid !== null);
-  }
-  //
   public get is_storeable(): boolean {
     return (this.type !== null) && (this.collection_name !== null) &&
       this.has_departementid && this.has_anneeid && this.has_semestreid &&
@@ -234,46 +227,22 @@ class BaseEvent extends DescriptionItem implements InfoData.IBaseItem {
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_departementid) {
-      oMap.departementid = this.departementid;
-    }
-    if (this.has_anneeid) {
       oMap.anneeid = this.anneeid;
-    }
-    if (this.has_semestreid) {
       oMap.semestreid = this.semestreid;
-    }
-    if (this.has_groupeid) {
       oMap.groupeid = this.groupeid;
-    }
-    if (this.has_personid) {
       oMap.personid = this.personid;
-    }
-    if (this.has_date) {
       oMap.date = this.date;
-    }
-    if (this.has_genre) {
       oMap.genre = this.genre;
-    }
-    if (this.has_uniteid) {
       oMap.uniteid = this.uniteid;
-    }
-    if (this.has_matiereid) {
       oMap.matiereid = this.matiereid;
-    }
-    if (this.has_status){
       oMap.status = this.status;
-    }
-    if (this.has_documentids){
       oMap.documentids = this.documentids;
-    }
   }// to_insert_map
   public to_fetch_map(oMap: any) : void {
     super.to_fetch_map(oMap);
     if (oMap.documentids !== undefined){
       oMap.documentids = null;
     }
-
   }
 }// class Affectation
 export = BaseEvent;

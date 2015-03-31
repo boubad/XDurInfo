@@ -25,6 +25,20 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._user = null;
+    this._pass = null;
+    this._first = null;
+    this._last = null;
+    this._email = null;
+    this._phone = null;
+    this._roles = [];
+    this._deps = [];
+    this._annees = [];
+    this._semestres = [];
+    this._matieres = [];
+    this._unites = [];
+    this._groupes = [];
+    this._infos = [];
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.username !== undefined) {
         this.username = oMap.username;
@@ -73,10 +87,11 @@ class Person extends DescriptionItem implements InfoData.IPerson {
 
   //
   public get departementids(): any[] {
-    return (this._deps !== undefined) ? this._deps : null;
+    return this._deps;
   }
   public set departementids(s: any[]) {
-    this._deps = (s !== undefined) ? s : null;
+    this._deps = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : [];
   }
   public get has_departementids(): boolean {
     return ((this._deps !== undefined) && (this._deps !== null) &&
@@ -102,10 +117,11 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get groupeids(): any[] {
-    return (this._groupes !== undefined) ? this._groupes : null;
+    return this._groupes;
   }
   public set groupeids(s: any[]) {
-    this._groupes = (s !== undefined) ? s : null;
+    this._groupes = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : [];
   }
   public get has_groupeids(): boolean {
     return ((this._groupes !== undefined) && (this._groupes !== null) &&
@@ -131,10 +147,11 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get anneeids(): any[] {
-    return (this._annees !== undefined) ? this._annees : null;
+    return this._annees;
   }
   public set anneeids(s: any[]) {
-    this._annees = (s !== undefined) ? s : null;
+    this._annees = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : [];
   }
   public get has_anneeids(): boolean {
     return ((this._annees !== undefined) && (this._annees !== null) &&
@@ -160,10 +177,11 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get semestreids(): any[] {
-    return (this._semestres !== undefined) ? this._semestres : null;
+    return this._semestres;
   }
   public set semestreids(s: any[]) {
-    this._semestres = (s !== undefined) ? s : null;
+    this._semestres = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : [];
   }
   public get has_semestreids(): boolean {
     return ((this._semestres !== undefined) && (this._semestres !== null) &&
@@ -189,10 +207,11 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get uniteids(): any[] {
-    return (this._unites !== undefined) ? this._unites : null;
+    return this._unites;
   }
   public set uniteids(s: any[]) {
-    this._unites = (s !== undefined) ? s : null;
+    this._unites = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : [];
   }
   public get has_uniteids(): boolean {
     return ((this._unites !== undefined) && (this._unites !== null) &&
@@ -218,10 +237,11 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get matiereids(): any[] {
-    return (this._matieres !== undefined) ? this._matieres : null;
+    return this._matieres;
   }
   public set matiereids(s: any[]) {
-    this._matieres = (s !== undefined) ? s : null;
+    this._matieres = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : [];
   }
   public get has_matiereids(): boolean {
     return ((this._matieres !== undefined) && (this._matieres !== null) &&
@@ -247,10 +267,11 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get infoids(): any[] {
-    return (this._infos !== undefined) ? this._infos : null;
+    return this._infos;
   }
   public set infoids(s: any[]) {
-    this._infos = (s !== undefined) ? s : null;
+    this._infos = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : [];
   }
   public get has_infoids(): boolean {
     return ((this._infos !== undefined) && (this._infos !== null) &&
@@ -276,10 +297,11 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get roles(): string[] {
-    return (this._roles !== undefined) ? this._roles : null;
+    return this._roles;
   }
   public set roles(s: string[]) {
-    this._roles = (s !== undefined) ? s : null;
+    this._roles = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : [];
   }
   public get has_roles(): boolean {
     return ((this._roles !== undefined) && (this._roles !== null) &&
@@ -350,7 +372,7 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get username(): string {
-    return (this._user !== undefined) ? this._user : null;
+    return this._user;
   }
   public set username(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -364,7 +386,7 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get lastname(): string {
-    return (this._last !== undefined) ? this._last : null;
+    return this._last;
   }
   public set lastname(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -378,7 +400,7 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get firstname(): string {
-    return (this._first !== undefined) ? this._first : null;
+    return this._first;
   }
   public set firstname(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -415,7 +437,7 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get password(): string {
-    return (this._pass !== undefined) ? this._pass : null;
+    return this._pass;
   }
   public set password(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -429,7 +451,7 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   }
   //
   public get email(): string {
-    return (this._email !== undefined) ? this._email : null;
+    return this._email;
   }
   public set email(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -442,7 +464,7 @@ class Person extends DescriptionItem implements InfoData.IPerson {
     return (this.email !== null);
   }
   public get phone(): string {
-    return (this._phone !== undefined) ? this._phone : null;
+    return this._phone;
   }
   public set phone(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -457,75 +479,32 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   //
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_username) {
       oMap.username = this.username;
-    }
-    if (this.has_password) {
       oMap.password = this.password;
-    }
-    if (this.has_firstname) {
       oMap.firstname = this.firstname;
-    }
-    if (this.has_lastname) {
       oMap.lastname = this.lastname;
-    }
-    if (this.has_email) {
       oMap.email = this.email;
-    }
-    if (this.has_phone) {
       oMap.phone = this.phone;
-    }
-    if (this.has_roles) {
       oMap.roles = this.roles;
-    }
-    if (this.has_departementids) {
       oMap.departementids = this.departementids;
-    }
-    if (this.has_uniteids) {
       oMap.uniteids = this.uniteids;
-    }
-    if (this.has_matiereids) {
       oMap.matiereids = this.matiereids;
-    }
-    if (this.has_anneeids) {
       oMap.anneeids = this.anneeids;
-    }
-    if (this.has_semestreids) {
       oMap.semestreids = this.semestreids;
-    }
-    if (this.has_infoids) {
       oMap.infoids = this.infoids;
-    }
-    if (this.has_groupeids) {
       oMap.groupeids = this.groupeids;
-    }
   } // to_insert_map
   public to_fetch_map(oMap: any): void {
-    super.to_insert_map(oMap);
-    if (this.has_id){
       oMap._id = this.id;
-    }
-    if (this.has_rev){
       oMap._rev = this.rev;
-    }
-    if (this.has_username) {
+      oMap.description = this.description;
+      oMap.avatarid = this.avatarid;
       oMap.username = this.username;
-    }
-    if (this.has_password) {
       oMap.password = this.password;
-    }
-    if (this.has_firstname) {
       oMap.firstname = this.firstname;
-    }
-    if (this.has_lastname) {
       oMap.lastname = this.lastname;
-    }
-    if (this.has_email) {
       oMap.email = this.email;
-    }
-    if (this.has_phone) {
       oMap.phone = this.phone;
-    }
   }
   public get is_storeable(): boolean {
     return (this.has_username && this.has_lastname && this.has_firstname);

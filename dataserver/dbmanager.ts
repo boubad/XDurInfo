@@ -1,8 +1,8 @@
 // dbmanager.ts
 /// <reference path='../public/lib/typings/q/Q.d.ts'/>
 //
-var mongoskin = require('mongoskin');
-var Q = require('q');
+import mongoskin = require('mongoskin');
+import Q = require('q');
 //
 var db = mongoskin.db('mongodb://@localhost:27017/infodb', { safe: true });
 var fid = mongoskin.helper.toObjectID;

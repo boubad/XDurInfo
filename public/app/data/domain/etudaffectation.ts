@@ -8,6 +8,7 @@ class EtudAffectation extends Affectation implements InfoData.IEtudAffectation {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._etudiantid = null;
     if ((oMap != undefined) && (oMap != null)) {
       if (oMap.etudiantid != undefined) {
         this.etudiantid = oMap.etudiantid;
@@ -16,7 +17,7 @@ class EtudAffectation extends Affectation implements InfoData.IEtudAffectation {
   }// constructor
   //
   public get etudiantid(): any {
-    return (this._etudiantid != undefined) ? this._etudiantid : null;
+    return this._etudiantid;
   }
   public set etudiantid(s: any) {
     if ((s != undefined) && (s != null) && (s.toString().trim().length > 0)) {

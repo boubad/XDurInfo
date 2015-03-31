@@ -7,7 +7,7 @@ class AdminPerson extends Person implements InfoData.IAdminPerson {
   //
   constructor(oMap?: any) {
     super(oMap);
-    this.add_role('admin');
+    this.roles = ['admin'];
   }
   public get type(): string {
     return "adminperson";

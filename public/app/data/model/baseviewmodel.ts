@@ -9,6 +9,7 @@ import app = require('durandal/app');
 import InfoData = require('../../infodata');
 import BaseItem = require('../domain/baseitem');
 import ItemDataManager = require('../services/itemdatamanager');
+import userInfo = require('./userinfo');
 //
 class BaseViewModel {
     public dataService:InfoData.IDataManager;
@@ -21,7 +22,7 @@ class BaseViewModel {
     public hasInfo:KnockoutComputed<boolean>;
     //
     constructor() {
-      this.dataService = new ItemDataManager();
+      this.dataService = userInfo.dataService;
       this.title = ko.observable(null);
       this.error = ko.observable(null);
       this.info = ko.observable(null);
@@ -66,7 +67,7 @@ class BaseViewModel {
       }
       return vRet;
     }// string_to_number
-    public internal_set_error(err:any) : void {
+    public internal_set_error(err:any) : any {
       var ss:string = null;
       if ((err !== undefined) && (err !== null)){
          if ((err.msg !== undefined) && (err.msg !== null)){
@@ -78,6 +79,7 @@ class BaseViewModel {
          }
       }// err
       this.error(ss);
+      return true;
     }// internal_set_error
 }// class BaseViewModel
 export = BaseViewModel;

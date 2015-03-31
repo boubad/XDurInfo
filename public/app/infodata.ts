@@ -16,40 +16,75 @@ export interface IBaseItem {
   //
   sigle?:string;
   name?:string;
-  remarks?:string;
+  description?:string;
   departementid?:any;
   anneeid?:any;
   semestreid?:any;
   uniteid?:any;
   matiereid?:any;
   groupeid?:any;
-  startDate?:any;
-  endDate?:any;
+  startDate?:Date;
+  endDate?:Date;
   genre?:string;
   mat_module?:string;
   coefficient?:number;
   ecs?:number;
-  has_sigle?:boolean;
+  personid?:any;
+  avatarid?:any;
+  fullname?:string;
+  date?:Date;
+  location?:string;
+  startTime?:Date;
+  note?:number;
+  status?:string;
+  enseignantid?:any;
+  etudiantid?:any;
+  profaffectationid?: any;
+  etudaffectationid?:any;
+  username?: string;
+  password?: string;
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  phone?: string;
+  roles?: string[];
+  departementids?: any[];
+  anneeids?: any[];
+  semestreids?: any[];
+  matiereids?: any[];
+  uniteids?: any[];
+  groupeids?: any[];
+  infoids?: any[];
+  mimetype?: string;
+  data?: any[];
+  dossier?: string;
+  sexe?: string;
+  birthDate?: Date;
+  ville?: string;
+  etablissement?: string;
+  serieBac?: string;
+  optionBac?: string;
+  mentionBac?: string;
+  etudesSuperieures?: string;
 }// interface IBaseItem
 export interface IDescriptionItem extends IBaseItem {
-  remarks: string;
+  description: string;
   avatarid: any;
   //
-  has_remarks: boolean;
+  has_description: boolean;
   has_avatarid: boolean;
 }// interface IDescriptionItem
-export interface IAttachedDoc extends IBaseItem {
+export interface IAttachedDoc extends IDescriptionItem {
   mimetype: string;
   genre: string;
   name: string;
-  data: number[];
-  remarks: string;
+  data: any[];
+  description: string;
   //
   has_mimetype: boolean;
   has_genre: boolean;
   has_name: boolean;
   has_data: boolean;
-  has_remarks: boolean;
 }// interface IAttachedDoc
 export interface IPerson extends IDescriptionItem {
   username: string;
@@ -135,6 +170,9 @@ export interface IEtudiantPerson extends IPerson {
   mentionBac: string;
   etudesSuperieures: string;
   //
+  isMale: boolean;
+  isFeminin: boolean;
+  //
   has_dossier: boolean;
   has_sexe: boolean;
   has_birthDate: boolean;
@@ -196,11 +234,10 @@ export interface IMatiere extends IDepartementSigleNameItem {
   has_mat_module: boolean
 }// interface IMatiere
 //
-export interface IDepartementPerson extends IDescriptionItem {
+export interface IDepartementPerson extends IDepartementChild {
   personid: any;
-  departementid: any;
-  has_departementid: boolean;
   has_personid: boolean;
+  fullname: string;
 }// interface IDepartementPerson
 //
 export interface IEtudiant extends IDepartementPerson {
@@ -212,12 +249,12 @@ export interface IOperator extends IDepartementPerson {
 export interface IAdministrator extends IDepartementPerson {
 }// interface IOperator
 //
-export interface IAffectation extends IDescriptionItem {
+export interface IAffectation extends IDepartementChild {
   semestreid: any;
   groupeid: any;
-  departementid: any;
   anneeid: any;
   personid: any;
+  fullname: string;
   startDate: Date;
   endDate: Date;
   //
@@ -226,6 +263,7 @@ export interface IAffectation extends IDescriptionItem {
   has_personid: boolean;
   has_startDate: boolean;
   has_endDate: boolean;
+  has_fullname : boolean;
 } // interface IAffectation
 export interface IEtudAffectation extends IAffectation {
   etudiantid: any;
@@ -241,8 +279,7 @@ export interface IProfAffectation extends IAffectation {
   has_enseignantid: boolean;
 }// interface IProfAffectation
 //
-export interface IBaseEvent extends IDescriptionItem {
-  departementid: any;
+export interface IBaseEvent extends IDepartementChild {
   anneeid: any;
   semestreid: any;
   uniteid: any;
@@ -254,7 +291,6 @@ export interface IBaseEvent extends IDescriptionItem {
   documentids: any[];
   status: string;
   //
-  has_departementid: boolean;
   has_anneeid: boolean;
   has_semestreid: boolean;
   has_uniteid: boolean;
@@ -299,6 +335,18 @@ export interface IEtudEvent extends IBaseEvent {
   has_etudiantid: boolean;
 }// interface IGroupeEvent
 //
+export interface IStoreManagerImpl {
+  perform_get: (id:any) => Q.IPromise<any>;
+  perfom_remove: (id: any) => Q.IPromise<any>;
+  perform_store: (id:any, data:any) => Q.IPromise<any>;
+}// interface IStoreManager
+//
+export interface IObjectStore {
+  get_value: (id:any) => Q.IPromise<IBaseItem>;
+  store_value: (item: IBaseItem) => Q.IPromise<any>;
+  remove_value: (id:any) => Q.IPromise<any>;
+}// interface IObjectStore
+//
 export interface IHttpManager {
   perform_get: (url: string) => Q.IPromise<any>;
   perform_post: (url: string, data: any) => Q.IPromise<any>;
@@ -316,8 +364,11 @@ export interface IDataManager {
   update_one_item: (item: IBaseItem) => Q.IPromise<any>;
   maintains_one_item: (item: IBaseItem) => Q.IPromise<any>;
   remove_one_item: (item: IBaseItem) => Q.IPromise<any>;
+  get_items_array : (item:IBaseItem, ids:any[]) => Q.IPromise<IBaseItem[]>;
 }// interface IDataManager
 export interface IMenuDesc {
   refer:string;
   title:string;
+  desc?:string;
+  source?:string;
 }

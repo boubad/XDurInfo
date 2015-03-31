@@ -8,6 +8,7 @@ class DepartementSigleNameItem extends SigleNameItem implements InfoData.ISigleN
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._departementid = null;
     if ((oMap != undefined) && (oMap != null)) {
       if (oMap.departementid != undefined) {
         this.departementid = oMap.departementid;
@@ -15,7 +16,7 @@ class DepartementSigleNameItem extends SigleNameItem implements InfoData.ISigleN
     }// oMap
   }// constructor
   public get departementid(): any {
-    return (this._departementid != undefined) ? this._departementid : null;
+    return this._departementid;
   }
   public set departementid(s: any) {
     if ((s != undefined) && (s != null) && (s.toString().trim().length > 0)) {
@@ -29,13 +30,11 @@ class DepartementSigleNameItem extends SigleNameItem implements InfoData.ISigleN
   }
   public get is_storeable(): boolean {
     return (this.type != null) && (this.collection_name != null) &&
-      this.has_departementid && this.has_sigle;
+      (this.departementid !== null) && (this.sigle !== null);
   }
   public to_insert_map(oMap: any) : void {
     super.to_insert_map(oMap);
-    if (this.has_departementid) {
-      oMap.departementid = this.departementid;
-    }
+    oMap.departementid = this.departementid;
   }// to_insert_map
 } // class SigleNameItemItem
 export = DepartementSigleNameItem;

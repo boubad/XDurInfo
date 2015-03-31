@@ -17,6 +17,13 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._profaff = null;
+    this._prof = null;
+    this._name = null;
+    this._location = null;
+    this._start = null;
+    this._end = null;
+    this._coef = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.profaffectationid !== undefined) {
         this.profaffectationid = oMap.profaffectationid;
@@ -49,7 +56,7 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   }
   //
   public get profaffectationid(): any {
-    return (this._profaff !== undefined) ? this._profaff : null;
+    return this._profaff;
   }
   public set profaffectationid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -62,7 +69,7 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
     return (this.profaffectationid !== null);
   }
   public get name(): string {
-    return (this._name !== undefined) ? this._name : null;
+    return this._name;
   }
   public set name(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -76,7 +83,7 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   }
   //
   public get location(): string {
-    return (this._location !== undefined) ? this._location : null;
+    return this._location;
   }
   public set location(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -90,7 +97,7 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   }
   //
   public get startTime(): Date {
-    return (this._start !== undefined) ? this._start : null;
+    return this._start;
   }
   public set startTime(d: Date) {
     this._start = BaseItem.check_date(d);
@@ -100,7 +107,7 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   }
   //
   public get endTime(): Date {
-    return (this._end !== undefined) ? this._end : null;
+    return this._end;
   }
   public set endTime(d: Date) {
     this._end = BaseItem.check_date(d);
@@ -110,7 +117,7 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   }
   //
   public get enseignantid(): any {
-    return (this._prof !== undefined) ? this._prof : null;
+    return this._prof;
   }
   public set enseignantid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -124,7 +131,7 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   }
   //
   public get coefficient(): number {
-    return (this._coef !== undefined) ? this._coef : null;
+    return this._coef;
   }
   public set coefficient(s: number) {
     if ((s !== undefined) && (s !== null) && (s > 0)) {
@@ -146,27 +153,13 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_profaffectationid) {
       oMap.profaffectationid = this.profaffectationid;
-    }
-    if (this.has_enseignantid) {
       oMap.enseignantid = this.enseignantid;
-    }
-    if (this.has_name) {
       oMap.name = this.name;
-    }
-    if (this.has_location) {
       oMap.location = this.location;
-    }
-    if (this.has_coefficient) {
       oMap.coefficient = this.coefficient;
-    }
-    if (this.has_startTime) {
       oMap.startTime = this.startTime;
-    }
-    if (this.has_endTime) {
       oMap.endTime = this.endTime;
-    }
   }// to_insert_map
 
 }// class GroupeEvent

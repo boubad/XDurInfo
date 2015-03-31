@@ -1,38 +1,36 @@
 //departementperson.ts
 import InfoData = require('../../infodata');
 //
-import DescriptionItem = require('./descriptionitem');
+import DepartementChild = require('./departementchild');
 //
-class DepartementPerson extends DescriptionItem implements InfoData.IDepartementPerson {
-  private _departementid: any;
+class DepartementPerson extends DepartementChild implements InfoData.IDepartementPerson {
   private _personid: any;
+  private _fullname: string;
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._personid = null;
     if ((oMap !== undefined) && (oMap !== null)) {
-      if (oMap.departementid !== undefined) {
-        this.departementid = oMap.departementid;
-      }
       if (oMap.personid !== undefined) {
         this.personid = oMap.personid;
       }
+      if (oMap.fullname !== undefined){
+        this.fullname = oMap.fullname;
+      }
     }// oMap
   }// constructor
-  public get departementid(): any {
-    return (this._departementid !== undefined) ? this._departementid : null;
+  public get fullname(): string {
+    return this._fullname;
   }
-  public set departementid(s: any) {
-    if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
-      this._departementid = s;
-    } else {
-      this._departementid = null;
-    }
+  public set fullname(s:string){
+      this._fullname = ((s !== undefined) && (s !== null) &&
+      (s.trim().length > 0)) ? s.trim() : null;
   }
-  public get has_departementid(): boolean {
-    return (this.departementid !== null);
+  public get has_fullname():boolean {
+    return (this.fullname !== null);
   }
   public get personid(): any {
-    return (this._personid !== undefined) ? this._personid : null;
+    return this._personid;
   }
   public set personid(s: any) {
     if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
@@ -46,16 +44,11 @@ class DepartementPerson extends DescriptionItem implements InfoData.IDepartement
   }
   public get is_storeable(): boolean {
     return (this.type !== null) && (this.collection_name !== null) &&
-      this.has_departementid && this.has_personid;
+      (this.departementid !== null) && (this.personid !== null);
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_departementid) {
-      oMap.departementid = this.departementid;
-    }
-    if (this.has_personid) {
       oMap.personid = this.personid;
-    }
   }// to_insert_map
 }// class DepartementPerson
 export = DepartementPerson;

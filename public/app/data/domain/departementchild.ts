@@ -7,6 +7,7 @@ class DepartementChildItem extends DescriptionItem implements InfoData.IDepartem
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._departementid = null;
     if ((oMap != undefined) && (oMap != null)) {
       if (oMap.departementid != undefined) {
         this.departementid = oMap.departementid;
@@ -14,7 +15,7 @@ class DepartementChildItem extends DescriptionItem implements InfoData.IDepartem
     }// oMap
   }// constructor
   public get departementid(): any {
-    return (this._departementid != undefined) ? this._departementid : null;
+    return this._departementid;
   }
   public set departementid(s: any) {
     if ((s != undefined) && (s != null) && (s.toString().trim().length > 0)) {
@@ -28,13 +29,11 @@ class DepartementChildItem extends DescriptionItem implements InfoData.IDepartem
   }
   public get is_storeable(): boolean {
     return (this.type != null) && (this.collection_name != null) &&
-      this.has_departementid;
+      (this.departementid !== null);
   }
   public to_insert_map(oMap: any) : void {
     super.to_insert_map(oMap);
-    if (this.has_departementid) {
-      oMap.departementid = this.departementid;
-    }
+    oMap.departementid = this.departementid;
   }// to_insert_map
 }// class DepartementChildItem
 export = DepartementChildItem;

@@ -1,10 +1,9 @@
 // attacheddoc.ts
 import InfoData = require('../../infodata');
 //
-import BaseItem = require('./baseitem');
+import DescriptionItem = require('./descriptionitem');
 //
-class AttachedDoc extends BaseItem implements InfoData.IAttachedDoc {
-  private _desc: string;
+class AttachedDoc extends DescriptionItem implements InfoData.IAttachedDoc {
   private _mime: string;
   private _genre: string;
   private _name: string;
@@ -12,10 +11,11 @@ class AttachedDoc extends BaseItem implements InfoData.IAttachedDoc {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._mime = null;
+    this._genre = null;
+    this._name = null;
+    this._data = null;
     if ((oMap !== undefined) && (oMap !== null)) {
-      if (oMap.remarks !== undefined) {
-        this.remarks = oMap.remarks;
-      }
       if (oMap.mimetype !== undefined) {
         this.mimetype = oMap.mimetype;
       }
@@ -31,91 +31,56 @@ class AttachedDoc extends BaseItem implements InfoData.IAttachedDoc {
     } // oMap
   } // constructor
   public get data(): any[] {
-    return (this._data !== undefined) ? this._data : null;
+    return this._data;
   } // id
   public set data(s: any[]) {
-    if ((s !== undefined) && (s !== null) && (s.length > 0)) {
-      this._data = s;
-    } else {
-      this._data = null;
-    }
+    this._data = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
+    (s.length > 0)) ? s : null;
   }
   public get has_data(): boolean {
     return (this.data !== null);
   }
   public get name(): string {
-    return (this._name !== undefined) ? this._name : null;
+    return this._name;
   } // id
   public set name(s: string) {
-    if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
-      this._name = s.trim();
-    } else {
-      this._name = null;
-    }
+    this._name = ((s !== undefined) && (s !== null) && (s.trim().length > 0)) ?
+    s.trim() : null;
   }
   public get has_name(): boolean {
     return (this.name !== null);
   }
   public get genre(): string {
-    return (this._genre !== undefined) ? this._genre : null;
+    return this._genre;
   } // id
   public set genre(s: string) {
-    if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
-      this._genre = s.trim().toLowerCase();
-    } else {
-      this._genre = null;
-    }
+    this._genre = ((s !== undefined) && (s !== null) && (s.trim().length > 0)) ?
+    s.trim().toLowerCase() : null;
   }
   public get has_genre(): boolean {
     return (this.genre !== null);
   }
   public get mimetype(): string {
-    return (this._mime !== undefined) ? this._mime : null;
+    return this._mime;
   } // id
   public set mimetype(s: string) {
-    if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
-      this._mime = s.trim();
-    } else {
-      this._mime = null;
-    }
+    this._mime = ((s !== undefined) && (s !== null) && (s.trim().length > 0)) ?
+    s.trim() : null;
   }
   public get has_mimetype(): boolean {
     return (this.mimetype !== null);
   }
-  public get remarks(): string {
-    return (this._desc !== undefined) ? this._desc : null;
-  } // description
-  public set remarks(s: string) {
-    if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
-      this._desc = s.trim();
-    } else {
-      this._desc = null;
-    }
-  } // description
-  public get has_remarks(): boolean {
-    return (this.remarks !== null);
-  }
+
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_remarks) {
-      oMap.remarks = this.remarks;
-    }
-    if (this.has_mimetype) {
-      oMap.mimetype = this.mimetype;
-    }
-    if (this.has_genre) {
-      oMap.genre = this.genre;
-    }
-    if (this.has_name) {
-      oMap.name = this.name;
-    }
-    if (this.has_data) {
-      oMap.data = this.data;
-    }
+    oMap.mimetype = this.mimetype;
+    oMap.genre = this.genre;
+    oMap.name = this.name;
+    oMap.data = this.data;
   } // toInsertMap
-  public get is_storeable():boolean {
+  public get is_storeable(): boolean {
     return (this.has_mimetype &&
-       this.has_genre && this.has_name && this.has_data);
+      this.has_genre && this.has_name && this.has_data);
   }
   public get type(): string {
     return 'attacheddoc';

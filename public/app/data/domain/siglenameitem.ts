@@ -9,6 +9,8 @@ class SigleNameItem extends DescriptionItem implements InfoData.ISigleNameItem{
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._sigle = null;
+    this._name = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.sigle !== undefined) {
         this.sigle = oMap.sigle;
@@ -19,7 +21,7 @@ class SigleNameItem extends DescriptionItem implements InfoData.ISigleNameItem{
     } // oMap
   } // constructor
   public get sigle(): string {
-    return (this._sigle != undefined) ? this._sigle : null;
+    return this._sigle;
   }
   public set sigle(s: string) {
     if ((s != undefined) && (s != null) && (s.trim().length > 0)) {
@@ -32,7 +34,7 @@ class SigleNameItem extends DescriptionItem implements InfoData.ISigleNameItem{
     return (this.sigle != null);
   }
   public get name(): string {
-    return (this._name != undefined) ? this._name : null;
+    return this._name;
   }
   public set name(s: string) {
     if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
@@ -46,16 +48,12 @@ class SigleNameItem extends DescriptionItem implements InfoData.ISigleNameItem{
   }
   public get is_storeable(): boolean {
     return (this.type != null) && (this.collection_name != null) &&
-      this.has_sigle;
+      (this.sigle !== null);
   }
   to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_sigle) {
       oMap.sigle = this.sigle;
-    }
-    if (this.has_name) {
       oMap.name = this.name;
-    }
   } // toInsertMap
 } // class SigleNameItemItem
 export = SigleNameItem;

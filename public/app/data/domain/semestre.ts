@@ -7,6 +7,7 @@ class Semestre extends IntervalItem implements InfoData.ISemestre {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._anneeid = null;
     if ((oMap != undefined) && (oMap != null)) {
       if (oMap.anneeid != undefined) {
         this.anneeid = oMap.anneeid;
@@ -14,7 +15,7 @@ class Semestre extends IntervalItem implements InfoData.ISemestre {
     }// oMap
   } // constructor
   public get anneeid(): any {
-    return (this._anneeid != undefined) ? this._anneeid : null;
+    return this._anneeid;
   }
   public set anneeid(s: any) {
     if ((s != undefined) && (s != null) && (s.toString().trim().length > 0)) {
@@ -28,15 +29,14 @@ class Semestre extends IntervalItem implements InfoData.ISemestre {
   }
   public get is_storeable(): boolean {
     return (this.type != null) && (this.collection_name != null) &&
-      this.has_departementid && this.has_sigle && this.has_anneeid &&
-      this.has_startDate && this.has_endDate &&
+      (this.departementid !== null) && (this.sigle !== null)
+       && (this.anneeid !== null) &&
+      (this.startDate !== null) && (this.endDate !== null) &&
       (this.startDate.getTime() <= this.endDate.getTime());
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_anneeid) {
       oMap.anneeid = this.anneeid;
-    }
   }// to_insert_map
   public get type(): string {
     return 'semestre';

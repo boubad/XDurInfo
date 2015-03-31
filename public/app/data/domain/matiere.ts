@@ -12,6 +12,11 @@ class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._uniteid = null;
+    this._coef = null;
+    this._ecs = null;
+    this._genre = null;
+    this._module = null;
     if ((oMap != undefined) && (oMap != null)) {
       if (oMap.uniteid != undefined) {
         this.uniteid = oMap.uniteid;
@@ -38,7 +43,7 @@ class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
     return 'matieres';
   }
   public get mat_module(): string {
-    return ((this._module != undefined) && (this._module != null)) ? this._module : null;
+    return this._module;
   }
   public set mat_module(v: string) {
     if ((v != undefined) && (v != null) && (v.trim().length > 0)) {
@@ -51,7 +56,7 @@ class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
     return (this.mat_module != null);
   }
   public get genre(): string {
-    return ((this._genre != undefined) && (this._genre != null)) ? this._genre : null;
+    return this._genre;
   }
   public set genre(v: string) {
     if ((v != undefined) && (v != null) && (v.trim().length > 0)) {
@@ -64,7 +69,7 @@ class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
     return (this.genre != null);
   }
   public get ecs(): number {
-    return ((this._ecs != undefined) && (this._ecs != null)) ? this._ecs : null;
+    return this._ecs;
   }
   public set ecs(v: number) {
     if ((v != undefined) && (v != null) && (v > 0)) {
@@ -77,7 +82,7 @@ class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
     return (this.ecs != null);
   }
   public get coefficient(): number {
-    return ((this._coef != undefined) && (this._coef != null)) ? this._coef : null;
+    return this._coef;
   }
   public set coefficient(v: number) {
     if ((v != undefined) && (v != null) && (v > 0)) {
@@ -90,7 +95,7 @@ class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
     return (this.coefficient != null);
   }
   public get uniteid(): any {
-    return (this._uniteid != undefined) ? this._uniteid : null;
+    return this._uniteid;
   }
   public set uniteid(s: any) {
     if ((s != undefined) && (s != null) && (s.toString().trim().length > 0)) {
@@ -104,25 +109,15 @@ class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
   }
   public get is_storeable(): boolean {
     return (this.type != null) && (this.collection_name != null) &&
-      this.has_departementid && this.has_uniteid;
+      (this.departementid !== null) && (this.uniteid !== null);
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_uniteid) {
       oMap.uniteid = this.uniteid;
-    }
-    if (this.has_genre) {
       oMap.genre = this.genre;
-    }
-    if (this.has_mat_module) {
       oMap.mat_module = this.mat_module;
-    }
-    if (this.has_coefficient) {
       oMap.coefficient = this.coefficient;
-    }
-    if (this.has_ecs) {
       oMap.ecs = this.ecs;
-    }
   }// to_insert_map
 } // class Matiere
 export = Matiere;

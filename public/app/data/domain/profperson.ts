@@ -7,7 +7,7 @@ class ProfPerson extends Person implements InfoData.IProfPerson {
   //
   constructor(oMap?: any) {
     super(oMap);
-    this.add_role('prof');
+    this.roles =['prof'];
   }
   public get type(): string {
     return "profperson";

@@ -12,22 +12,22 @@ class SigleNameViewModel extends PagedViewModel {
   //
   public sigle: KnockoutComputed<string>;
   public name: KnockoutComputed<string>;
-  public remarks: KnockoutComputed<string>;
+  public description: KnockoutComputed<string>;
   //
   constructor(model: InfoData.ISigleNameItem) {
     super(model);
     this.sigle = ko.computed({
       read: () => {
         var v = this.current();
-        if ((v !== undefined) && (v !== null) && (v.sigle !== undefined)){
+        if ((v !== undefined) && (v !== null) && (v.sigle !== undefined)) {
           return v.sigle;
         } else {
           return null;
         }
       },
-      write: (s) => {
+      write: (s: string) => {
         var v = this.current();
-        if ((v !== undefined) && (v !== null) && (v.sigle !== undefined)){
+        if ((v !== undefined) && (v !== null) && (v.sigle !== undefined)) {
           v.sigle = s;
           this.current(v);
         }
@@ -37,43 +37,43 @@ class SigleNameViewModel extends PagedViewModel {
     this.name = ko.computed({
       read: () => {
         var v = this.current();
-        if ((v !== undefined) && (v !== null) && (v.name !== undefined)){
+        if ((v !== undefined) && (v !== null) && (v.name !== undefined)) {
           return v.name;
         } else {
           return null;
         }
       },
-      write: (s) => {
+      write: (s: string) => {
         var v = this.current();
-        if ((v !== undefined) && (v !== null) && (v.name !== undefined)){
+        if ((v !== undefined) && (v !== null) && (v.name !== undefined)) {
           v.name = s;
           this.current(v);
         }
       },
       owner: this
     });
-    this.remarks = ko.computed({
+    this.description = ko.computed({
       read: () => {
         var v = this.current();
-        if ((v !== undefined) && (v !== null) && (v.remarks !== undefined)){
-          return v.remarks;
+        if ((v !== undefined) && (v !== null) && (v.description !== undefined)) {
+          return v.description;
         } else {
           return null;
         }
       },
-      write: (s) => {
+      write: (s: string) => {
         var v = this.current();
-        if ((v !== undefined) && (v !== null) && (v.remarks !== undefined)){
-          v.remarks = s;
+        if ((v !== undefined) && (v !== null) && (v.description !== undefined)) {
+          v.description = s;
           this.current(v)
         }
       },
       owner: this
     });
-    this.canSave = ko.computed(()=>{
+    this.canSave = ko.computed(() => {
       var v = this.sigle();
       return ((v !== undefined) && (v !== null) && (v.trim().length > 0));
-    },this);
+    }, this);
   }// constructor
 }// class SigleNameViewModel
 export = SigleNameViewModel;

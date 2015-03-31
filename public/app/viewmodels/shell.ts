@@ -14,6 +14,7 @@ var shell = {
     router.map([
       { route: '', title: 'Welcome', moduleId: 'viewmodels/welcome', nav: true },
       { route: 'admin', title: 'Admin', moduleId: 'viewmodels/departements', nav: true },
+      { route: 'groupes/:depid', title: 'Groupes', moduleId: 'viewmodels/groupes', nav: false },
       { route: 'flickr', moduleId: 'viewmodels/flickr', nav: true }
     ]).buildNavigationModel();
 

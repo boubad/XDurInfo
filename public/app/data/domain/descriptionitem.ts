@@ -9,9 +9,11 @@ class DescriptionItem extends BaseItem  implements InfoData.IDescriptionItem {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._desc = null;
+    this._avatarid = null;
     if ((oMap !== undefined) && (oMap !== null)) {
-      if (oMap.remarks !== undefined) {
-        this.remarks = oMap.remarks;
+      if (oMap.description !== undefined) {
+        this.description = oMap.description;
       }
       if (oMap.avatarid !== undefined) {
         this.avatarid = oMap.avatarid;
@@ -19,39 +21,29 @@ class DescriptionItem extends BaseItem  implements InfoData.IDescriptionItem {
     } // oMap
   } // constructor
   public get avatarid(): any {
-    return (this._avatarid !== undefined) ? this._avatarid : null;
+    return this._avatarid;
   } // id
   public set avatarid(s: any) {
-    if ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) {
-      this._avatarid = s;
-    } else {
-      this._avatarid = null;
-    }
+    this._avatarid = ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) ?
+    s : null;
   } // id
   public get has_avatarid(): boolean {
     return (this.avatarid !== null);
   }
-  public get remarks(): string {
-    return (this._desc !== undefined) ? this._desc : null;
+  public get description(): string {
+    return this._desc;
   } // description
-  public set remarks(s: string) {
-    if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
-      this._desc = s.trim();
-    } else {
-      this._desc = null;
-    }
+  public set description(s: string) {
+    this._desc = ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) ?
+    s : null;
   } // description
-  public get has_remarks(): boolean {
-    return (this.remarks !== null);
+  public get has_description(): boolean {
+    return (this.description !== null);
   }
   public to_insert_map(oMap: any) : void {
     super.to_insert_map(oMap);
-    if (this.has_remarks) {
-      oMap.remarks = this.remarks;
-    }
-    if (this.has_avatarid) {
+      oMap.description = this.description;
       oMap.avatarid = this.avatarid;
-    }
   } // toInsertMap
 }// class DescriptionItem
 export = DescriptionItem;

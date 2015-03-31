@@ -9,61 +9,52 @@ import ItemDataManager = require('../services/itemdatamanager');
 //
 class IntervalViewModel extends DepartementSigleNameViewModel {
   //
-  public startDate: KnockoutObservable<string>;
-  public endDate: KnockoutObservable<string>;
+  public startDate: KnockoutComputed<Date>;
+  public endDate: KnockoutComputed<Date>;
   //
   constructor(model: InfoData.IIntervalItem) {
     super(model);
-    this.startDate = ko.observable(null);
-    this.endDate = ko.observable(null);
+    this.startDate = ko.computed({
+      read: () => {
+        var v = this.current();
+        return (v !== null) ? v.startDate : null;
+      },
+      write : (s:Date)=>{
+        var v = this.current();
+        if (v != null){
+          v.startDate = s;
+        }
+      },
+      owner: this
+    });
+    this.endDate = ko.computed({
+      read: () => {
+        var v = this.current();
+        return (v !== null) ? v.endDate : null;
+      },
+      write : (s:Date)=>{
+        var v = this.current();
+        if (v != null){
+          v.endDate = s;
+        }
+      },
+      owner: this
+    });
     this.canSave = ko.computed(() => {
       var item = this.current();
       if ((item === undefined) || (item === null)) {
         return false;
       }
-      var d1: Date = this.string_to_date(this.startDate());
-      var d2: Date = this.string_to_date(this.endDate());
+      var d1: Date = this.startDate();
+      var d2: Date = this.endDate();
       if ((d1 === null) || (d2 === null)) {
         return false;
       }
       if (d1.getTime() > d2.getTime()) {
         return false;
       }
-      return (this.departementid !== null) && item.has_sigle;
+      return (this.departementid !== null) && (item.sigle !== null);
     }, this);
   }// constructor
-  public change_current(s: InfoData.IBaseItem) {
-    super.change_current(s);
-    var d1: string = null;
-    var d2: string = null;
-    var item = this.current();
-    if ((item !== undefined) && (item !== null)) {
-      d1 = this.date_to_string(item.startDate);
-      d2 = this.date_to_string(item.endDate);
-    }
-    this.startDate(d1);
-    this.endDate(d2);
-  }
-  public save(): void {
-    var item = this.current();
-    if ((item === undefined) || (item === null)) {
-      return;
-    }
-    var d1: Date = this.string_to_date(this.startDate());
-    var d2: Date = this.string_to_date(this.endDate());
-    if ((d1 === null) || (d2 === null)) {
-      return;
-    }
-    if (d1.getTime() > d2.getTime()) {
-      return;
-    }
-    if ((this.departementid === null) || (!item.has_sigle)) {
-      return;
-    }
-    item.departementid = this.departementid;
-    item.startDate = d1;
-    item.endDate = d2;
-    super.save();
-  }// save
 }// class DepartementNameViewModel
 export = IntervalViewModel;

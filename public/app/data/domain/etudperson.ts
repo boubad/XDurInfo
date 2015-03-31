@@ -19,6 +19,15 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   //
   constructor(oMap?: any) {
     super(oMap);
+    this._dossier = null;
+    this._sexe = null;
+    this._date = null;
+    this._ville = null;
+    this._etablissement = null;
+    this._seriebac = null;
+    this._optionbac = null;
+    this._mentionbac = null;
+    this._sup = null;
     this.roles=['etud'];
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.dossier !== undefined) {
@@ -50,16 +59,12 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
       }
     } // oMap
   } // constructor
-  public add_role(id: string): void {
-  }
-  public remove_role(id: string): void {
-  }
   public get type(): string {
     return "etudperson";
   }
   //
   public get dossier(): string {
-    return (this._dossier !== undefined) ? this._dossier : null;
+    return this._dossier;
   }
   public set dossier(s: string) {
     this._dossier = ((s !== undefined) &&
@@ -70,7 +75,7 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   }
   //
   public get sexe(): string {
-    return (this._sexe !== undefined) ? this._sexe : null;
+    return this._sexe;
   }
   public set sexe(s) {
     this._sexe = ((s !== undefined) &&
@@ -79,9 +84,25 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   public get has_sexe(): boolean {
     return (this.sexe !== null);
   }
+  public get isMale():boolean {
+    return ((this.sexe !== null) && (this.sexe == 'masculin'));
+  }
+  public set isMale(b:boolean){
+    if ((b !== undefined) && (b !== null)){
+      this._sexe = (b == true) ? 'masculin' : 'feminin';
+    }
+  }
+  public get isFeminin():boolean {
+    return ((this.sexe !== null) && (this.sexe == 'feminin'));
+  }
+  public set isFeminin(b:boolean){
+    if ((b !== undefined) && (b !== null)){
+      this._sexe = (b == true) ? 'feminin' : 'masculin';
+    }
+  }
   //
   public get birthDate(): Date {
-    return (this._date !== undefined) ? this._date : null;
+    return this._date;
   }
   public set birthDate(s: Date) {
     this._date = BaseItem.check_date(s);
@@ -91,7 +112,7 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   }
   //
   public get ville(): string {
-    return (this._ville !== undefined) ? this._ville : null;
+    return this._ville;
   }
   public set ville(s: string) {
     this._ville = ((s !== undefined) &&
@@ -102,7 +123,7 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   }
   //
   public get etablissement(): string {
-    return (this._etablissement !== undefined) ? this._etablissement : null;
+    return this._etablissement;
   }
   public set etablissement(s: string) {
     this._etablissement = ((s !== undefined) &&
@@ -113,7 +134,7 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   }
   //
   public get serieBac(): string {
-    return (this._seriebac !== undefined) ? this._seriebac : null;
+    return this._seriebac;
   }
   public set serieBac(s: string) {
     this._seriebac = ((s !== undefined) &&
@@ -124,7 +145,7 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   }
   //
   public get optionBac(): string {
-    return (this._optionbac !== undefined) ? this._optionbac : null;
+    return this._optionbac;
   }
   public set optionBac(s: string) {
     this._optionbac = ((s !== undefined) &&
@@ -134,7 +155,7 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
     return (this.optionBac !== null);
   }
   public get mentionBac(): string {
-    return (this._mentionbac !== undefined) ? this._mentionbac : null;
+    return this._mentionbac;
   }
   public set mentionBac(s: string) {
     this._mentionbac = ((s !== undefined) &&
@@ -145,7 +166,7 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   }
   //
   public get etudesSuperieures(): string {
-    return (this._sup !== undefined) ? this._sup : null;
+    return this._sup;
   }
   public set etudesSuperieures(s: string) {
     this._sup = ((s !== undefined) &&
@@ -156,63 +177,27 @@ class EtudiantPerson extends Person implements InfoData.IEtudiantPerson {
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
-    if (this.has_dossier) {
       oMap.dossier = this.dossier;
-    }
-    if (this.has_sexe) {
       oMap.sexe = this.sexe;
-    }
-    if (this.has_birthDate) {
       oMap.birthDate = this.birthDate;
-    }
-    if (this.has_ville) {
       oMap.ville = this.ville;
-    }
-    if (this.has_etablissement) {
       oMap.etablissement = this.etablissement;
-    }
-    if (this.has_serieBac) {
       oMap.serieBac = this.serieBac;
-    }
-    if (this.has_optionBac) {
       oMap.optionBac = this.optionBac;
-    }
-    if (this.has_mentionBac) {
       oMap.mentionBac = this.mentionBac;
-    }
-    if (this.has_etudesSuperieures) {
       oMap.etudesSuperieures = this.etudesSuperieures;
-    }
   } // to_insert_map
   public to_fetch_map(oMap:any) : void {
     super.to_fetch_map(oMap);
-    if (this.has_dossier) {
       oMap.dossier = this.dossier;
-    }
-    if (this.has_sexe) {
       oMap.sexe = this.sexe;
-    }
-    if (this.has_birthDate) {
       oMap.birthDate = this.birthDate;
-    }
-    if (this.has_ville) {
       oMap.ville = this.ville;
-    }
-    if (this.has_etablissement) {
       oMap.etablissement = this.etablissement;
-    }
-    if (this.has_serieBac) {
       oMap.serieBac = this.serieBac;
-    }
-    if (this.has_optionBac) {
       oMap.optionBac = this.optionBac;
-    }
-    if (this.has_mentionBac) {
       oMap.mentionBac = this.mentionBac;
-    }
-    if (this.has_etudesSuperieures) {
       oMap.etudesSuperieures = this.etudesSuperieures;
-    }
   }
 } // class EtudiantPerson
 export = EtudiantPerson;
