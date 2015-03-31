@@ -9,7 +9,7 @@ import ItemGenerator = require('../itemgenerator');
 class ItemDataManager extends ItemGenerator implements InfoData.IDataManager {
   //
   constructor() {
-    super();http
+    super();
   }// constructor
   //
   public static  form_url(prefix?: string, params?: string[], query?: any): string {

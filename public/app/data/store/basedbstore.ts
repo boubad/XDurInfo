@@ -107,11 +107,12 @@ class BaseDBStore extends ItemGenerator {
     skip : 0;
     var count = ((limit !== undefined) && (limit !== null) && (limit > 0)) ?
     limit : 16;
+    var colname = item.collection_name;
     return Q.Promise((resolve, reject) => {
       this.open().then((db)=>{
         var res = [];
         var pos = 0;
-         var transaction = db.transaction([item.collection_name]);
+         var transaction = db.transaction([colname]);
           transaction.oncomplete = (evt)=>{
             resolve(res);
           };
@@ -125,7 +126,7 @@ class BaseDBStore extends ItemGenerator {
          cc.onsuccess = (evt) =>{
             var cursor = cc.result;
             if ((cursor !== undefined) && (cursor !== null)){
-              if (pos >= start){
+              if (pos >= offset){
                  var x = this.create_item(cursor);
                  if (x !== null){
                    res.push(x);
@@ -133,7 +134,7 @@ class BaseDBStore extends ItemGenerator {
               }
               ++pos;
               if (res.length < count){
-                cc.continue();
+                cursor.continue();
               } 
             } 
          };
@@ -142,7 +143,7 @@ class BaseDBStore extends ItemGenerator {
          cc.onsuccess = (evt) =>{
             var cursor = cc.result;
             if ((cursor !== undefined) && (cursor !== null)){
-              if (pos >= start){
+              if (pos >= offset){
                  var x = this.create_item(cursor);
                  if (x !== null){
                    res.push(x);
@@ -150,7 +151,7 @@ class BaseDBStore extends ItemGenerator {
               }
               ++pos;
               if (res.length < count){
-                cc.continue();
+                cursor.continue();
               } 
             } 
          };
