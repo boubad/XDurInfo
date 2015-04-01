@@ -5,6 +5,7 @@ export interface IBaseItem {
   id: any;
   rev: any;
   type: string;
+  localmode: string;
   collection_name: string;
   //
   has_id: boolean;

@@ -8,16 +8,21 @@ import moment = require('moment');
 class BaseItem implements InfoData.IBaseItem {
   private _id: any;
   private _rev: any;
+  private _localmode:string;
   //
   constructor(oMap?: any) {
     this._id = null;
     this._rev = null;
+    this._localmode = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap._id !== undefined) {
         this.id = oMap._id;
       }
       if (oMap._rev !== undefined) {
         this.rev = oMap._rev;
+      }
+      if (oMap.localmode !== undefined){
+        this.localmode = oMap.localmode;
       }
     }
   }// constructor
@@ -80,6 +85,13 @@ class BaseItem implements InfoData.IBaseItem {
   public get has_type(): boolean {
     return (this.type !== null);
   }
+  public get localmode():string {
+    return this._localmode;
+  }
+  public set localmode(s:string){
+    this._localmode =  ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) ?
+    s : null;
+  }
   public get collection_name(): string {
     return null;
   }
@@ -91,11 +103,15 @@ class BaseItem implements InfoData.IBaseItem {
   }
   public to_insert_map(oMap: any): void {
       oMap.type = this.type;
+      if (this.localmode !== null){
+        oMap.localmode = this.localmode;
+      }
   }
   public to_fetch_map(oMap: any): void {
     this.to_insert_map(oMap);
     oMap._id = this.id;
     oMap._rev = this.rev;
+    oMap.localmode = null;
   }
   public toString(): string {
     var oMap = {};

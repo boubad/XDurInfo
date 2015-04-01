@@ -40,7 +40,7 @@ require.config({
 
 // require the unit tests.
 require(
-    ['q','QUnit','test/itemdatamanager-test'],
+    ['q','QUnit','test/basedatastore-test'],
     function(Q,QUnit, mytest) {
         // run the tests.
         //dummyTest.run();

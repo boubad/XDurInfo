@@ -4,86 +4,14 @@ import http = require('plugins/http');
 import Q = require('q');
 //
 import InfoData = require('../../infodata');
-import BaseItem = require('../domain/baseitem');
-import Person = require('../domain/person');
-import EtudiantPerson = require('../domain/etudperson');
-import ProfPerson = require('../domain/profperson');
-import AdminPerson = require('../domain/adminperson');
-import OperPerson = require('../domain/operperson');
-import Departement = require('../domain/departement');
-import Annee = require('../domain/annee');
-import Unite = require('../domain/unite');
-import Groupe = require('../domain/groupe');
-import Matiere = require('../domain/matiere');
-import Semestre = require('../domain/semestre');
-import Enseignant = require('../domain/enseignant');
-import Etudiant = require('../domain/etudiant');
-import ProfAffectation = require('../domain/profaffectation');
-import EtudAffectation = require('../domain/etudaffectation');
-import GroupeEvent = require('../domain/groupeevent');
-import EtudEvent = require('../domain/etudevent');
-import AttachedDoc = require('../domain/attacheddoc');
-import Operator = require('../domain/operator');
-import Administrator = require('../domain/administrator');
+import ItemGenerator = require('../itemgenerator');
 //
-//
-class ItemDataManager implements InfoData.IDataManager {
+class ItemDataManager extends ItemGenerator implements InfoData.IDataManager {
   //
   constructor() {
+    super();
   }// constructor
   //
-  public create_item(oMap: any): InfoData.IBaseItem {
-    if ((oMap === undefined) || (oMap === null)){
-      return null;
-    }
-    if ((oMap.type === undefined)  || (oMap.type === null)) {
-      return null;
-    }
-    var t: string = oMap.type.trim().toLowerCase();
-    if (t.length < 1){
-      return null;
-    }
-    if (t == 'departement') {
-      return new Departement(oMap);
-    } else if (t == 'person') {
-      return new Person(oMap);
-    } else if (t == 'etudperson') {
-      return new EtudiantPerson(oMap);
-    } else if (t == 'profperson') {
-      return new ProfPerson(oMap);
-    }  else if (t == 'operperson') {
-      return new OperPerson(oMap);
-    }   else if (t == 'adminperson') {
-      return new AdminPerson(oMap);
-    } else if (t == 'etud') {
-      return new Etudiant(oMap);
-    }  else if (t == 'enseignant') {
-      return new Enseignant(oMap);
-    }  else if (t == 'unite') {
-      return new Unite(oMap);
-    } else if (t == 'groupe') {
-      return new Groupe(oMap);
-    } else if (t == 'matiere') {
-      return new Matiere(oMap);
-    } else if (t == 'semestre') {
-      return new Semestre(oMap);
-    }  else if (t == 'profaffectation') {
-      return new ProfAffectation(oMap);
-    }  else if (t == 'etudaffectation') {
-      return new EtudAffectation(oMap);
-    } else if (t == 'groupeevent') {
-      return new GroupeEvent(oMap);
-    } else if (t == 'etudevent') {
-      return new EtudEvent(oMap);
-    } else if (t == 'attacheddoc') {
-      return new AttachedDoc(oMap);
-    }else if (t == 'operator') {
-      return new Operator(oMap);
-    }else if (t == 'administrator') {
-      return new Administrator(oMap);
-    }
-    return null;
-  }// create_item
   public static  form_url(prefix?: string, params?: string[], query?: any): string {
     var sRet = '/api/';
     if ((prefix != undefined) && (prefix != null)) {
@@ -132,6 +60,9 @@ class ItemDataManager implements InfoData.IDataManager {
   private _perform_post(item: InfoData.IBaseItem): Q.IPromise<any> {
     var oMap = {};
     item.to_insert_map(oMap);
+    if (oMap['localmode'] !== undefined){
+      oMap['localmode']= null;
+    }
     var url = ItemDataManager.form_url(item.collection_name);
     return http.post(url, oMap);
   }// _perform_post
@@ -139,6 +70,9 @@ class ItemDataManager implements InfoData.IDataManager {
   private _perform_put(item: InfoData.IBaseItem): Q.IPromise<any> {
     var oMap = {};
     item.to_insert_map(oMap);
+    if (oMap['localmode'] !== undefined){
+      oMap['localmode']= null;
+    }
     var url =  ItemDataManager.form_url(item.collection_name, [item.id.toString()]);
     return http.put(url, oMap);
   }// _perform_put
