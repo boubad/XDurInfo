@@ -14,6 +14,7 @@ export interface IBaseItem {
   //
   to_insert_map: (oMap: any) => void;
   to_fetch_map: (oMap: any) => void;
+  sort_func : (p1:IBaseItem, p2:IBaseItem) => number;
   //
   sigle?:string;
   name?:string;

@@ -149,5 +149,23 @@ class Affectation extends DepartementChild implements InfoData.IAffectation {
       oMap.endDate = this.endDate;
       oMap.fullname = this.fullname;
   }// to_insert_map
+  public sort_func(p1:InfoData.IAffectation, p2:InfoData.IAffectation): number {
+        var vRet = -1;
+        if ((p1 !== undefined) && (p2 !== undefined) && (p1 !== null) && (p2 !== null)) {
+            if ((p1.fullname !== undefined) && (p1.fullname !== null)) {
+                if ((p2.fullname !== undefined) && (p2.fullname !== null)) {
+                    var s1 = p1.fullname;
+                    var s2 = p2.fullname;
+                } else {
+                    vRet = 1;
+                }
+            } else {
+                vRet = 1;
+            }
+        } else if ((p1 === undefined) || (p1 === null)) {
+            vRet = 1;
+        }
+        return vRet;
+    } // sort_func
 }// class Affectation
 export = Affectation;

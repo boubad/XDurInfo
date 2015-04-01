@@ -60,6 +60,7 @@
         "./data/services/infohttpmanager.ts",
         "./data/services/itemdatamanager.ts",
         "./data/store/basedbstore.ts",
+        "./data/store/localdatamanager.ts",
         "./data/store/objectid.ts",
         "./data/test/basedatastore-test.ts",
         "./data/test/baseitem-test.ts",

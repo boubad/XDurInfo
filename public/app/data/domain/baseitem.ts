@@ -183,5 +183,24 @@ class BaseItem implements InfoData.IBaseItem {
       }// val
     }
   }// _array_add
+  public sort_func(p1:InfoData.IBaseItem, p2:InfoData.IBaseItem): number {
+        var vRet = -1;
+        if ((p1 !== undefined) && (p2 !== undefined) && (p1 !== null) && (p2 !== null)) {
+            if ((p1.id !== undefined) && (p1.id !== null)) {
+                if ((p2.id !== undefined) && (p2.id !== null)) {
+                    var s1 = p1.id.toString();
+                    var s2 = p2.id.toString();
+                    vRet = s1.localeCompare(s2);
+                } else {
+                    vRet = 1;
+                }
+            } else {
+                vRet = 1;
+            }
+        } else if ((p1 === undefined) || (p1 === null)) {
+            vRet = 1;
+        }
+        return vRet;
+    } // sort_func
 }// class BaseItem
 export = BaseItem;

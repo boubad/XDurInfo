@@ -55,5 +55,24 @@ class SigleNameItem extends DescriptionItem implements InfoData.ISigleNameItem{
       oMap.sigle = this.sigle;
       oMap.name = this.name;
   } // toInsertMap
+  public sort_func(p1:InfoData.ISigleNameItem, p2:InfoData.ISigleNameItem): number {
+        var vRet = -1;
+        if ((p1 !== undefined) && (p2 !== undefined) && (p1 !== null) && (p2 !== null)) {
+            if ((p1.sigle !== undefined) && (p1.sigle !== null)) {
+                if ((p2.sigle !== undefined) && (p2.sigle !== null)) {
+                    var s1 = p1.sigle;
+                    var s2 = p2.sigle;
+                    vRet = s1.localeCompare(s2);
+                } else {
+                    vRet = 1;
+                }
+            } else {
+                vRet = 1;
+            }
+        } else if ((p1 === undefined) || (p1 === null)) {
+            vRet = 1;
+        }
+        return vRet;
+    } // sort_func
 } // class SigleNameItemItem
 export = SigleNameItem;

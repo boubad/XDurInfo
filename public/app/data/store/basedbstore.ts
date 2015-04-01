@@ -182,9 +182,15 @@ class BaseDBStore extends ItemGenerator {
               if (res.length < count) {
                 cursor.continue();
               } else {
+                if ((res.length > 1) && (item.sort_func !== undefined)) {
+                  res.sort(item.sort_func);
+                }
                 resolve(res);
               }
             } else {
+              if ((res.length > 1) && (item.sort_func !== undefined)) {
+                res.sort(item.sort_func);
+              }
               resolve(res);
             }
           };
@@ -208,9 +214,15 @@ class BaseDBStore extends ItemGenerator {
               if (res.length < count) {
                 cursor.continue();
               } else {
+                if ((res.length > 1) && (item.sort_func !== undefined)) {
+                  res.sort(item.sort_func);
+                }
                 resolve(res);
               }
             } else {
+              if ((res.length > 1) && (item.sort_func !== undefined)) {
+                res.sort(item.sort_func);
+              }
               resolve(res);
             }
           };
@@ -302,7 +314,7 @@ class BaseDBStore extends ItemGenerator {
         });
       }
     });
-  }//maintains_one_item
+  }//remove_one_item
   //
 }// class BaseDBStore
 export = BaseDBStore;

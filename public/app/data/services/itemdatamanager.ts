@@ -105,6 +105,9 @@ class ItemDataManager extends ItemGenerator implements InfoData.IDataManager {
           vRet.push(x);
         }
       }// i
+      if ((vRet.length > 1) && (item.sort_func !== undefined)){
+        vRet.sort(item.sort_func);
+      }
       return vRet;
     });
   }//get_items

@@ -50,5 +50,30 @@ class IntervalItem extends DepartementSigleNameItem implements InfoData.IInterva
       oMap.startDate = this.startDate;
       oMap.endDate = this.endDate;
   } // to_insert_map
+  public sort_func(p1:InfoData.IIntervalItem, p2:InfoData.IIntervalItem): number {
+        var vRet = -1;
+        if ((p1 !== undefined) && (p2 !== undefined) && (p1 !== null) && (p2 !== null)) {
+            if ((p1.startDate !== undefined) && (p1.startDate !== null)) {
+                if ((p2.startDate !== undefined) && (p2.startDate !== null)) {
+                    var s1 = Date.parse(p1.startDate.toString());
+                    var s2 = Date.parse(p2.startDate.toString());
+                    if (s1 < s2){
+                      vRet = 1;
+                    } else if (s1 > s2){
+                      vRet = -1;
+                    } else {
+                      vRet = 0;
+                    }
+                } else {
+                    vRet = 1;
+                }
+            } else {
+                vRet = 1;
+            }
+        } else if ((p1 === undefined) || (p1 === null)) {
+            vRet = 1;
+        }
+        return vRet;
+    } // sort_func
 } // class IntervalItem
 export = IntervalItem;

@@ -50,5 +50,23 @@ class DepartementPerson extends DepartementChild implements InfoData.IDepartemen
     super.to_insert_map(oMap);
       oMap.personid = this.personid;
   }// to_insert_map
+  public sort_func(p1:InfoData.IDepartementPerson, p2:InfoData.IDepartementPerson): number {
+        var vRet = -1;
+        if ((p1 !== undefined) && (p2 !== undefined) && (p1 !== null) && (p2 !== null)) {
+            if ((p1.fullname !== undefined) && (p1.fullname !== null)) {
+                if ((p2.fullname !== undefined) && (p2.fullname !== null)) {
+                    var s1 = p1.fullname;
+                    var s2 = p2.fullname;
+                } else {
+                    vRet = 1;
+                }
+            } else {
+                vRet = 1;
+            }
+        } else if ((p1 === undefined) || (p1 === null)) {
+            vRet = 1;
+        }
+        return vRet;
+    } // sort_func
 }// class DepartementPerson
 export = DepartementPerson;

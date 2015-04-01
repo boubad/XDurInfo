@@ -244,5 +244,30 @@ class BaseEvent extends DepartementChild implements InfoData.IBaseEvent {
       oMap.documentids = null;
     }
   }
+  public sort_func(p1:InfoData.IBaseEvent, p2:InfoData.IBaseEvent): number {
+        var vRet = -1;
+        if ((p1 !== undefined) && (p2 !== undefined) && (p1 !== null) && (p2 !== null)) {
+            if ((p1.date !== undefined) && (p1.date !== null)) {
+                if ((p2.date !== undefined) && (p2.date !== null)) {
+                    var s1 = Date.parse(p1.date.toString());
+                    var s2 = Date.parse(p2.date.toString());
+                    if (s1 < s2){
+                      vRet = 1;
+                    } else if (s1 > s2){
+                      vRet = -1;
+                    } else {
+                      vRet = 0;
+                    }
+                } else {
+                    vRet = 1;
+                }
+            } else {
+                vRet = 1;
+            }
+        } else if ((p1 === undefined) || (p1 === null)) {
+            vRet = 1;
+        }
+        return vRet;
+    } // sort_func
 }// class Affectation
 export = BaseEvent;
