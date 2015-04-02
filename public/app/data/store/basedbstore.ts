@@ -6,6 +6,7 @@ import Q = require('q');
 import InfoData = require('../../infodata');
 import ItemGenerator = require('../itemgenerator');
 import ObjectId = require('./objectid');
+import Person = require('../domain/person');
 //
 interface IStoreItem {
   name: string;
@@ -15,8 +16,8 @@ interface IStoreItem {
 //
 class BaseDBStore extends ItemGenerator {
   //
-  private DBNAME: string = 'Infodb';
-  private VERSION: number = 2;
+  private DBNAME: string = 'infodb';
+  private VERSION: number = 3;
   private SCHEMA: IStoreItem[] = [
     { name: 'persons', index: ['username', 'lastname'], unique: true },
     { name: 'departements', index: ['sigle'], unique: true },
@@ -47,10 +48,14 @@ class BaseDBStore extends ItemGenerator {
       var colname = p.name;
       db.deleteObjectStore(colname);
     }// i
+    var personStore = null;
     for (i = 0; i < n; ++i) {
       var p = this.SCHEMA[i];
       var colname = p.name;
       var store = db.createObjectStore(colname, { keyPath: key });
+      if (colname == 'persons'){
+        personStore = store;
+      }
       var m = p.index.length;
       for (var j = 0; j < m; ++j) {
         var indexname = p.index[j];
@@ -61,6 +66,19 @@ class BaseDBStore extends ItemGenerator {
         }
       }// j
     }// i
+    if (personStore !== null){
+      var pPers = new Person({username:'admin',
+      firstname:'Administrator',lastname:'System',
+               roles:['super','admin']});
+       pPers.reset_password();
+       var oMap = {};
+       pPers.to_insert_map(oMap);
+       var oo = new ObjectId();
+       var id = oo.toString();
+       oMap['_id'] = id;
+       oMap['_rev'] = 1;
+       personStore.add(oMap);
+    }
   }// _create_schema
   public close(): void {
     if (this._db !== null) {
@@ -75,11 +93,14 @@ class BaseDBStore extends ItemGenerator {
       } else {
         var request: IDBOpenDBRequest = window.indexedDB.open(this.DBNAME, this.VERSION);
         request.onerror = ((evt) => {
-          reject(new Error(evt.target.errCode));
+          if ((request.error !== undefined) && (request.error !== null)){
+            reject(request.error);
+          }
         });
         request.onupgradeneeded = (evt: IDBVersionChangeEvent) => {
           var dx = request.result;
           this._create_schema(dx);
+
         };
         request.onsuccess = (evt) => {
           this._db = request.result;
@@ -94,23 +115,21 @@ class BaseDBStore extends ItemGenerator {
       if (id === null) {
         reject(new Error("Missing object id"));
       } else {
-        var t: InfoData.IBaseItem = null;
         var colname = item.collection_name;
         this.open().then((db) => {
           var transaction = db.transaction([colname]);
-          transaction.onerror = (evt) => {
-            if ((transaction.error !== undefined) &&
-              (transaction.error !== null)) {
-              reject(new Error(transaction.error.name));
-            }
-          };
           var store = transaction.objectStore(colname);
           var singleKeyRange = IDBKeyRange.only(id.toString());
           var cc = store.openCursor(singleKeyRange);
+          cc.onerror = (evt) => {
+            if ((cc.error !== undefined) && (cc.error !== null)){
+              reject(cc.error);
+            }
+          };
           cc.onsuccess = (evt) => {
             var cursor = cc.result;
             if ((cursor !== undefined) && (cursor !== null)) {
-              t = this.create_item(cursor);
+              var t = this.create_item(cursor);
               resolve(t);
             } else {
               resolve(null);
@@ -127,15 +146,14 @@ class BaseDBStore extends ItemGenerator {
       this.open().then((db) => {
         var colname = item.collection_name;
         var transaction = db.transaction([colname]);
-        transaction.onerror = (evt) => {
-          if ((transaction.error !== undefined) &&
-            (transaction.error !== null)) {
-            reject(new Error(transaction.error.name));
-          }
-        };
         var store = transaction.objectStore(colname);
         var index = store.index(indexname);
         var cc = index.get(indexval);
+        cc.onerror = (evt) => {
+          if ((cc.error !== undefined) && (cc.error !== null)){
+            reject(cc.error);
+          }
+        };
         cc.onsuccess = (evt) => {
           var oRet = null;
           var oMap = (cc.result !== undefined) ? cc.result : null;
@@ -165,9 +183,9 @@ class BaseDBStore extends ItemGenerator {
           var index = store.index(indexname);
           var cc = index.openCursor();
           cc.onerror = (evt) => {
-            var s = ((cc.error !== undefined) && (cc.error !== null)) ?
-              cc.error.name : 'get items cursor error';
-            reject(new Error(s));
+            if ((cc.error !== undefined) && (cc.error !== null)){
+              reject(cc.error);
+            }
           };
           cc.onsuccess = (evt) => {
             var cursor = cc.result;
@@ -197,9 +215,9 @@ class BaseDBStore extends ItemGenerator {
         } else {
           var cc = store.openCursor();
           cc.onerror = (evt) => {
-            var s = ((cc.error !== undefined) && (cc.error !== null)) ?
-              cc.error.name : 'get items cursor error';
-            reject(new Error(s));
+            if ((cc.error !== undefined) && (cc.error !== null)){
+              reject(cc.error);
+            }
           };
           cc.onsuccess = (evt) => {
             var cursor = cc.result;
@@ -240,10 +258,10 @@ class BaseDBStore extends ItemGenerator {
         var id = item.id;
         var colname = item.collection_name;
         var transaction = db.transaction([colname], 'readwrite');
-        transaction.onerror = (evt) => {
+        transaction.onabort = (evt) =>{
           if ((transaction.error !== undefined) &&
             (transaction.error !== null)) {
-            reject(new Error(transaction.error.name));
+            reject(transaction.error);
           }
         };
         transaction.oncomplete = (evt) => {
@@ -284,6 +302,78 @@ class BaseDBStore extends ItemGenerator {
     });
   }// maintains_one_item
   //
+  maintains_items(model:InfoData.IBaseItem,items: InfoData.IBaseItem[], bRegister?: boolean): Q.IPromise<any> {
+    return Q.Promise((resolve, reject) => {
+      this.open().then((db) => {
+        var oResult:any[] = [];
+        var colname = model.collection_name;
+        var transaction = db.transaction([colname], 'readwrite');
+        transaction.onabort = (evt) =>{
+          if ((transaction.error !== undefined) &&
+            (transaction.error !== null)) {
+            reject(transaction.error);
+          }
+        };
+        transaction.oncomplete = (evt) => {
+          resolve(oResult);
+        };
+        var store = transaction.objectStore(colname);
+        var n = items.length;
+        for (var i = 0; i < n; ++i){
+            var item = items[i];
+            var oMap = {};
+            item.to_insert_map(oMap);
+            var id = item.id;
+            if (id === null){
+              var oo = new ObjectId();
+              id = oo.toString();
+              oMap['_id'] = id;
+              oMap['_rev'] = 1;
+              oMap['localmode'] = 'inserted';
+              var request = store.add(oMap);
+              request.onsuccess = (evt) => {
+                var r  = request.result;
+                if ((r !== undefined) && (r !== null)){
+                  oResult.push(r);
+                }
+              };
+            } else {
+              oMap['_id'] = id;
+              if ((bRegister === undefined) || (bRegister === null) || (bRegister == false)) {
+                if ((item.rev !== null) && (item.rev > 0)) {
+                  oMap['_rev'] = item.rev + 1;
+                } else {
+                  oMap['_rev'] = 1;
+                }
+              }
+              var singleKeyRange = IDBKeyRange.only(id.toString());
+              var cc = store.openCursor(singleKeyRange);
+              cc.onsuccess = (evt) => {
+                var cursor = cc.result;
+                if ((cursor !== undefined) && (cursor !== null)) {
+                  var req = cursor.update(oMap);
+                  req.onsuccess = (evt) => {
+                    var r  = req.result;
+                    if ((r !== undefined) && (r !== null)){
+                      oResult.push(r);
+                    }
+                  };
+                } else {
+                  var request  = store.add(oMap);
+                  request.onsuccess = (evt) => {
+                    var r  = request.result;
+                    if ((r !== undefined) && (r !== null)){
+                      oResult.push(r);
+                    }
+                  };
+                }
+              };
+            }
+        }// i
+      });
+    });
+  }// maintains_items
+  //
   remove_one_item(item: InfoData.IBaseItem): Q.IPromise<any> {
     return Q.Promise((resolve, reject) => {
       var id = item.id;
@@ -293,14 +383,14 @@ class BaseDBStore extends ItemGenerator {
         var colname = item.collection_name;
         this.open().then((db) => {
           var transaction = db.transaction([colname], 'readwrite');
-          transaction.oncomplete = (evt) => {
-            resolve(true);
-          };
-          transaction.onerror = (evt) => {
+          transaction.onabort = (evt) =>{
             if ((transaction.error !== undefined) &&
               (transaction.error !== null)) {
-              reject(new Error(transaction.error.name));
+              reject(transaction.error);
             }
+          };
+          transaction.oncomplete = (evt) => {
+            resolve(true);
           };
           var store = transaction.objectStore(colname);
           var singleKeyRange = IDBKeyRange.only(id.toString());
@@ -315,6 +405,46 @@ class BaseDBStore extends ItemGenerator {
       }
     });
   }//remove_one_item
+  //
+  remove_items(model: InfoData.IBaseItem, ids:any[]): Q.IPromise<any> {
+    return Q.Promise((resolve, reject) => {
+      var colname = model.collection_name;
+      var oResult:any[] = [];
+      var n = ids.length;
+      this.open().then((db)=>{
+        var transaction = db.transaction([colname], 'readwrite');
+        transaction.onabort = (evt) =>{
+          if ((transaction.error !== undefined) &&
+            (transaction.error !== null)) {
+            reject(transaction.error);
+          }
+        };
+        transaction.oncomplete = (evt) => {
+          resolve(oResult);
+        };
+        var store = transaction.objectStore(colname);
+        for (var i = 0; i < n; ++i){
+            var id = ids[i];
+            if ((id !== undefined) && (id !== null)){
+              var singleKeyRange = IDBKeyRange.only(id.toString());
+              var cc = store.openCursor(singleKeyRange);
+              cc.onsuccess = (evt) => {
+                var cursor = cc.result;
+                if ((cursor !== undefined) && (cursor !== null)) {
+                    var request = cursor.delete();
+                    request.onsuccess = (evt) =>{
+                      var r = request.result;
+                      if ((r !== undefined) && (r !== null)){
+                        oResult.push(r);
+                      }
+                    };
+                }
+              };
+            }// i
+        }// i
+      });
+    });
+  }//remove_items
   //
 }// class BaseDBStore
 export = BaseDBStore;
