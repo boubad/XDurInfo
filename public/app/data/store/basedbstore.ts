@@ -39,21 +39,24 @@ class BaseDBStore extends ItemGenerator {
   constructor() {
     super();
   }// constructor
-  private _create_schema(db: IDBDatabase): void {
+  private _create_schema(db: IDBDatabase,
+    oldVersion: number, newVersion: number): void {
     var key = '_id';
     var n = this.SCHEMA.length;
     var i = 0;
-    for (i = 0; i < n; ++i) {
-      var p = this.SCHEMA[i];
-      var colname = p.name;
-      db.deleteObjectStore(colname);
-    }// i
+    if ((oldVersion > 1) && (newVersion > oldVersion)) {
+      for (i = 0; i < n; ++i) {
+        var p = this.SCHEMA[i];
+        var colname = p.name;
+        db.deleteObjectStore(colname);
+      }// i
+    }
     var personStore = null;
     for (i = 0; i < n; ++i) {
       var p = this.SCHEMA[i];
       var colname = p.name;
       var store = db.createObjectStore(colname, { keyPath: key });
-      if (colname == 'persons'){
+      if (colname == 'persons') {
         personStore = store;
       }
       var m = p.index.length;
@@ -66,18 +69,20 @@ class BaseDBStore extends ItemGenerator {
         }
       }// j
     }// i
-    if (personStore !== null){
-      var pPers = new Person({username:'admin',
-      firstname:'Administrator',lastname:'System',
-               roles:['super','admin']});
-       pPers.reset_password();
-       var oMap = {};
-       pPers.to_insert_map(oMap);
-       var oo = new ObjectId();
-       var id = oo.toString();
-       oMap['_id'] = id;
-       oMap['_rev'] = 1;
-       personStore.add(oMap);
+    if (personStore !== null) {
+      var pPers = new Person({
+        username: 'admin',
+        firstname: 'Administrator', lastname: 'System',
+        roles: ['super', 'admin']
+      });
+      pPers.reset_password();
+      var oMap = {};
+      pPers.to_insert_map(oMap);
+      var oo = new ObjectId();
+      var id = oo.toString();
+      oMap['_id'] = id;
+      oMap['_rev'] = 1;
+      personStore.add(oMap);
     }
   }// _create_schema
   public close(): void {
@@ -93,14 +98,16 @@ class BaseDBStore extends ItemGenerator {
       } else {
         var request: IDBOpenDBRequest = window.indexedDB.open(this.DBNAME, this.VERSION);
         request.onerror = ((evt) => {
-          if ((request.error !== undefined) && (request.error !== null)){
+          if ((request.error !== undefined) && (request.error !== null)) {
             reject(request.error);
           }
         });
+        request.onblocked = (evt) => {
+          alert('Veuillez fermer les autres instances de la base de donnée locale.');
+        };
         request.onupgradeneeded = (evt: IDBVersionChangeEvent) => {
           var dx = request.result;
-          this._create_schema(dx);
-
+          this._create_schema(dx, evt.oldVersion, evt.newVersion);
         };
         request.onsuccess = (evt) => {
           this._db = request.result;
@@ -115,24 +122,22 @@ class BaseDBStore extends ItemGenerator {
       if (id === null) {
         reject(new Error("Missing object id"));
       } else {
+        var oRet: InfoData.IBaseItem = null;
         var colname = item.collection_name;
         this.open().then((db) => {
           var transaction = db.transaction([colname]);
-          var store = transaction.objectStore(colname);
-          var singleKeyRange = IDBKeyRange.only(id.toString());
-          var cc = store.openCursor(singleKeyRange);
-          cc.onerror = (evt) => {
-            if ((cc.error !== undefined) && (cc.error !== null)){
-              reject(cc.error);
-            }
+          transaction.oncomplete = (evt) => {
+            resolve(oRet);
           };
+          transaction.onabort = (evt) => {
+            resolve(oRet);
+          };
+          var store = transaction.objectStore(colname);
+          var cc = store.get(id.toString());
           cc.onsuccess = (evt) => {
             var cursor = cc.result;
             if ((cursor !== undefined) && (cursor !== null)) {
-              var t = this.create_item(cursor);
-              resolve(t);
-            } else {
-              resolve(null);
+              oRet = this.create_item(cursor);
             }
           };
         });
@@ -141,19 +146,21 @@ class BaseDBStore extends ItemGenerator {
   }//get_one_item
   //
   find_item_by_index(item: InfoData.IBaseItem, indexname: string, indexval: any):
-    Q.IPromise<InfoData.IBaseItem[]> {
+    Q.IPromise<InfoData.IBaseItem> {
     return Q.Promise((resolve, reject) => {
       this.open().then((db) => {
+        var oRet: InfoData.IBaseItem = null;
         var colname = item.collection_name;
         var transaction = db.transaction([colname]);
+        transaction.oncomplete = (evt) => {
+          resolve(oRet);
+        };
+        transaction.onabort = (evt) => {
+          resolve(oRet);
+        };
         var store = transaction.objectStore(colname);
         var index = store.index(indexname);
         var cc = index.get(indexval);
-        cc.onerror = (evt) => {
-          if ((cc.error !== undefined) && (cc.error !== null)){
-            reject(cc.error);
-          }
-        };
         cc.onsuccess = (evt) => {
           var oRet = null;
           var oMap = (cc.result !== undefined) ? cc.result : null;
@@ -168,80 +175,64 @@ class BaseDBStore extends ItemGenerator {
   //
   get_items(item: InfoData.IBaseItem, indexname?: string,
     skip?: number, limit?: number): Q.IPromise<InfoData.IBaseItem[]> {
-    var offset = ((skip !== undefined) && (skip !== null) && (skip >= 0)) ?
-      skip : 0;
-    var count = ((limit !== undefined) && (limit !== null) && (limit > 0)) ?
-      limit : 16;
-    var colname = item.collection_name;
     return Q.Promise((resolve, reject) => {
+      var offset = ((skip !== undefined) && (skip !== null) && (skip >= 0)) ?
+        skip : 0;
+      var count = ((limit !== undefined) && (limit !== null) && (limit > 0)) ?
+        limit : 16;
+      var colname = item.collection_name;
       this.open().then((db) => {
-        var res = [];
+        var res: InfoData.IBaseItem[] = [];
         var pos = 0;
         var transaction = db.transaction([colname]);
+        transaction.oncomplete = (evt) => {
+          if ((res !== undefined) && (res !== null) && (res.length > 1)) {
+            if ((item.sort_func !== undefined) &&
+              (item.sort_func !== null)) {
+              res.sort(item.sort_func);
+            }
+          }
+          resolve(res);
+        };
+        transaction.onabort = (evt) => {
+          resolve(res);
+        };
         var store = transaction.objectStore(colname);
         if ((indexname !== undefined) && (indexname !== null)) {
           var index = store.index(indexname);
           var cc = index.openCursor();
-          cc.onerror = (evt) => {
-            if ((cc.error !== undefined) && (cc.error !== null)){
-              reject(cc.error);
-            }
-          };
           cc.onsuccess = (evt) => {
+            ++pos;
             var cursor = cc.result;
             if ((cursor !== undefined) && (cursor !== null)) {
-              if (pos >= offset) {
+              if ((pos >= offset) && (cursor.value !== null)) {
                 var x = this.create_item(cursor.value);
                 if (x !== null) {
                   res.push(x);
+                  count--;
                 }
               }
-              ++pos;
-              if (res.length < count) {
+              if (count > 0) {
                 cursor.continue();
-              } else {
-                if ((res.length > 1) && (item.sort_func !== undefined)) {
-                  res.sort(item.sort_func);
-                }
-                resolve(res);
               }
-            } else {
-              if ((res.length > 1) && (item.sort_func !== undefined)) {
-                res.sort(item.sort_func);
-              }
-              resolve(res);
             }
           };
         } else {
           var cc = store.openCursor();
-          cc.onerror = (evt) => {
-            if ((cc.error !== undefined) && (cc.error !== null)){
-              reject(cc.error);
-            }
-          };
           cc.onsuccess = (evt) => {
+            ++pos;
             var cursor = cc.result;
             if ((cursor !== undefined) && (cursor !== null)) {
-              if (pos >= offset) {
+              if ((pos >= offset) && (cursor.value !== null)) {
                 var x = this.create_item(cursor.value);
                 if (x !== null) {
                   res.push(x);
+                  count--;
                 }
               }
-              ++pos;
-              if (res.length < count) {
+              if (count > 0) {
                 cursor.continue();
-              } else {
-                if ((res.length > 1) && (item.sort_func !== undefined)) {
-                  res.sort(item.sort_func);
-                }
-                resolve(res);
               }
-            } else {
-              if ((res.length > 1) && (item.sort_func !== undefined)) {
-                res.sort(item.sort_func);
-              }
-              resolve(res);
             }
           };
         }
@@ -258,7 +249,7 @@ class BaseDBStore extends ItemGenerator {
         var id = item.id;
         var colname = item.collection_name;
         var transaction = db.transaction([colname], 'readwrite');
-        transaction.onabort = (evt) =>{
+        transaction.onabort = (evt) => {
           if ((transaction.error !== undefined) &&
             (transaction.error !== null)) {
             reject(transaction.error);
@@ -302,13 +293,13 @@ class BaseDBStore extends ItemGenerator {
     });
   }// maintains_one_item
   //
-  maintains_items(model:InfoData.IBaseItem,items: InfoData.IBaseItem[], bRegister?: boolean): Q.IPromise<any> {
+  maintains_items(model: InfoData.IBaseItem, items: InfoData.IBaseItem[], bRegister?: boolean): Q.IPromise<any> {
     return Q.Promise((resolve, reject) => {
       this.open().then((db) => {
-        var oResult:any[] = [];
+        var oResult: any[] = [];
         var colname = model.collection_name;
         var transaction = db.transaction([colname], 'readwrite');
-        transaction.onabort = (evt) =>{
+        transaction.onabort = (evt) => {
           if ((transaction.error !== undefined) &&
             (transaction.error !== null)) {
             reject(transaction.error);
@@ -319,56 +310,56 @@ class BaseDBStore extends ItemGenerator {
         };
         var store = transaction.objectStore(colname);
         var n = items.length;
-        for (var i = 0; i < n; ++i){
-            var item = items[i];
-            var oMap = {};
-            item.to_insert_map(oMap);
-            var id = item.id;
-            if (id === null){
-              var oo = new ObjectId();
-              id = oo.toString();
-              oMap['_id'] = id;
-              oMap['_rev'] = 1;
-              oMap['localmode'] = 'inserted';
-              var request = store.add(oMap);
-              request.onsuccess = (evt) => {
-                var r  = request.result;
-                if ((r !== undefined) && (r !== null)){
-                  oResult.push(r);
-                }
-              };
-            } else {
-              oMap['_id'] = id;
-              if ((bRegister === undefined) || (bRegister === null) || (bRegister == false)) {
-                if ((item.rev !== null) && (item.rev > 0)) {
-                  oMap['_rev'] = item.rev + 1;
-                } else {
-                  oMap['_rev'] = 1;
-                }
+        for (var i = 0; i < n; ++i) {
+          var item = items[i];
+          var oMap = {};
+          item.to_insert_map(oMap);
+          var id = item.id;
+          if (id === null) {
+            var oo = new ObjectId();
+            id = oo.toString();
+            oMap['_id'] = id;
+            oMap['_rev'] = 1;
+            oMap['localmode'] = 'inserted';
+            var request = store.add(oMap);
+            request.onsuccess = (evt) => {
+              var r = request.result;
+              if ((r !== undefined) && (r !== null)) {
+                oResult.push(r);
               }
-              var singleKeyRange = IDBKeyRange.only(id.toString());
-              var cc = store.openCursor(singleKeyRange);
-              cc.onsuccess = (evt) => {
-                var cursor = cc.result;
-                if ((cursor !== undefined) && (cursor !== null)) {
-                  var req = cursor.update(oMap);
-                  req.onsuccess = (evt) => {
-                    var r  = req.result;
-                    if ((r !== undefined) && (r !== null)){
-                      oResult.push(r);
-                    }
-                  };
-                } else {
-                  var request  = store.add(oMap);
-                  request.onsuccess = (evt) => {
-                    var r  = request.result;
-                    if ((r !== undefined) && (r !== null)){
-                      oResult.push(r);
-                    }
-                  };
-                }
-              };
+            };
+          } else {
+            oMap['_id'] = id;
+            if ((bRegister === undefined) || (bRegister === null) || (bRegister == false)) {
+              if ((item.rev !== null) && (item.rev > 0)) {
+                oMap['_rev'] = item.rev + 1;
+              } else {
+                oMap['_rev'] = 1;
+              }
             }
+            var singleKeyRange = IDBKeyRange.only(id.toString());
+            var cc = store.openCursor(singleKeyRange);
+            cc.onsuccess = (evt) => {
+              var cursor = cc.result;
+              if ((cursor !== undefined) && (cursor !== null)) {
+                var req = cursor.update(oMap);
+                req.onsuccess = (evt) => {
+                  var r = req.result;
+                  if ((r !== undefined) && (r !== null)) {
+                    oResult.push(r);
+                  }
+                };
+              } else {
+                var request = store.add(oMap);
+                request.onsuccess = (evt) => {
+                  var r = request.result;
+                  if ((r !== undefined) && (r !== null)) {
+                    oResult.push(r);
+                  }
+                };
+              }
+            };
+          }
         }// i
       });
     });
@@ -383,7 +374,7 @@ class BaseDBStore extends ItemGenerator {
         var colname = item.collection_name;
         this.open().then((db) => {
           var transaction = db.transaction([colname], 'readwrite');
-          transaction.onabort = (evt) =>{
+          transaction.onabort = (evt) => {
             if ((transaction.error !== undefined) &&
               (transaction.error !== null)) {
               reject(transaction.error);
@@ -406,14 +397,14 @@ class BaseDBStore extends ItemGenerator {
     });
   }//remove_one_item
   //
-  remove_items(model: InfoData.IBaseItem, ids:any[]): Q.IPromise<any> {
+  remove_items(model: InfoData.IBaseItem, ids: any[]): Q.IPromise<any> {
     return Q.Promise((resolve, reject) => {
       var colname = model.collection_name;
-      var oResult:any[] = [];
+      var oResult: any[] = [];
       var n = ids.length;
-      this.open().then((db)=>{
+      this.open().then((db) => {
         var transaction = db.transaction([colname], 'readwrite');
-        transaction.onabort = (evt) =>{
+        transaction.onabort = (evt) => {
           if ((transaction.error !== undefined) &&
             (transaction.error !== null)) {
             reject(transaction.error);
@@ -423,28 +414,40 @@ class BaseDBStore extends ItemGenerator {
           resolve(oResult);
         };
         var store = transaction.objectStore(colname);
-        for (var i = 0; i < n; ++i){
-            var id = ids[i];
-            if ((id !== undefined) && (id !== null)){
-              var singleKeyRange = IDBKeyRange.only(id.toString());
-              var cc = store.openCursor(singleKeyRange);
-              cc.onsuccess = (evt) => {
-                var cursor = cc.result;
-                if ((cursor !== undefined) && (cursor !== null)) {
-                    var request = cursor.delete();
-                    request.onsuccess = (evt) =>{
-                      var r = request.result;
-                      if ((r !== undefined) && (r !== null)){
-                        oResult.push(r);
-                      }
-                    };
-                }
-              };
-            }// i
+        for (var i = 0; i < n; ++i) {
+          var id = ids[i];
+          if ((id !== undefined) && (id !== null)) {
+            var singleKeyRange = IDBKeyRange.only(id.toString());
+            var cc = store.openCursor(singleKeyRange);
+            cc.onsuccess = (evt) => {
+              var cursor = cc.result;
+              if ((cursor !== undefined) && (cursor !== null)) {
+                var request = cursor.delete();
+                request.onsuccess = (evt) => {
+                  var r = request.result;
+                  if ((r !== undefined) && (r !== null)) {
+                    oResult.push(r);
+                  }
+                };
+              }
+            };
+          }// i
         }// i
       });
     });
   }//remove_items
+  //
+  perform_delete(transaction:IDBTransaction,storeName:string,indexName:string) : void {
+    var store = transaction.objectStore(storeName);
+    var index = store.index(indexName);
+    var cc = index.openCursor();
+    cc.onsuccess = (evt) => {
+      var cursor = cc.result;
+      if ((cursor !== undefined) && (cursor !== null)) {
+        cursor.delete();
+      }
+    };
+  }// perform_delete
   //
 }// class BaseDBStore
 export = BaseDBStore;

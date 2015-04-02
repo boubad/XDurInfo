@@ -5,6 +5,7 @@
 //
 import BaseDBStore = require('data/store/basedbstore');
 import Departement = require('data/domain/departement');
+
 //
 var main = ()=>{
   test('open',(assert)=>{
@@ -70,6 +71,31 @@ var main = ()=>{
       base.get_items(item).then((dd)=>{
         ok ((dd !== undefined) && (dd !== null), 'response is defined and not null');
         ok (dd.length >= 0, 'items count greater or equal 0 ==> ' + dd.length);
+        base.close();
+        done();
+      },(err) =>{
+        ok(false,"get_items Reject Error " + err.toString());
+        base.close();
+        done();
+      });
+    },(err)=>{
+      ok(false,"BaseDBStore Reject Error " + err.toString());
+      base.close();
+      done();
+    });
+  });
+  test('get_items by index',(assert)=>{
+    var done = assert.async();
+    var base = new BaseDBStore();
+    var item = new Departement();
+    var indexname = 'sigle';
+    base.open().then((db)=>{
+      ok((db !== undefined) && (db !== null));
+      base.get_items(item,indexname).then((dd)=>{
+        ok ((dd !== undefined) && (dd !== null), 'response is defined and not null');
+        ok (dd.length >= 0, 'items count greater or equal 0 ==> ' + dd.length);
+        base.close();
+        done();
       },(err) =>{
         ok(false,"get_items Reject Error " + err.toString());
         base.close();
