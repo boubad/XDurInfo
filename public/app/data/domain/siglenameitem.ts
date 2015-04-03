@@ -20,6 +20,9 @@ class SigleNameItem extends DescriptionItem implements InfoData.ISigleNameItem{
       }
     } // oMap
   } // constructor
+  public create_id():  string{
+    return this.sigle;
+  }// create_id
   public get sigle(): string {
     return this._sigle;
   }

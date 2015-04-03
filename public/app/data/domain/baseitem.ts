@@ -9,11 +9,13 @@ class BaseItem implements InfoData.IBaseItem {
   private _id: any;
   private _rev: any;
   private _localmode:string;
+  private _attachments:any;
   //
   constructor(oMap?: any) {
     this._id = null;
     this._rev = null;
     this._localmode = null;
+    this._attachments = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap._id !== undefined) {
         this.id = oMap._id;
@@ -24,8 +26,14 @@ class BaseItem implements InfoData.IBaseItem {
       if (oMap.localmode !== undefined){
         this.localmode = oMap.localmode;
       }
+      if (oMap._attachments !== undefined){
+        this.attachments = oMap._attachments;
+      }
     }
   }// constructor
+  public create_id():  string{
+    return (new Date()).toISOString();
+  }// create_id
   public static get date_format(): string {
     return 'YYYY-MM-DD';
   }
@@ -91,6 +99,15 @@ class BaseItem implements InfoData.IBaseItem {
   public set localmode(s:string){
     this._localmode =  ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) ?
     s : null;
+  }
+  public get attachments():any {
+    return this._attachments;
+  }
+  public set attachments(s:any){
+    this._attachments = (s !== undefined) ? s : null;
+  }
+  public get has_attachments():boolean{
+    return (this.attachments !== null);
   }
   public get collection_name(): string {
     return null;

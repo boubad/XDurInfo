@@ -33,6 +33,10 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
       }
     }// oMap
   }// constructor
+  public create_id():  string{
+    return 'EVT-' + this.groupeeventid  + '-' +
+    this.personid;
+  }// create_id
   public get type(): string {
     return 'etudevent';
   }

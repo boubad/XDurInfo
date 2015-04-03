@@ -9,10 +9,13 @@ class Administrator extends DepartementPerson implements InfoData.IAdministrator
     super(oMap);
   }// constructor
   public get type(): string {
-    return 'adminustrator';
+    return 'administrator';
   }
   public get collection_name(): string {
     return 'administrators';
   }
+  public create_id():  string{
+    return 'ADM-' + this.departementid + '-' + this.personid;
+  }// create_id
 }// class Administrator
 export = Administrator;

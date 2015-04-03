@@ -21,6 +21,9 @@ class IntervalItem extends DepartementSigleNameItem implements InfoData.IInterva
       }
     }
   }
+  public create_id():  string{
+    return this.departementid + '-' + this.startDate.toISOString() + '-' + this.sigle;
+  }// create_id
   public get startDate(): Date {
     return this._start;
   }

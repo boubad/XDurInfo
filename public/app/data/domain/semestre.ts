@@ -14,6 +14,9 @@ class Semestre extends IntervalItem implements InfoData.ISemestre {
       }
     }// oMap
   } // constructor
+  public create_id():  string{
+    return 'SEM-' + this.anneeid + '-' + this.startDate.toISOString();
+  }// create_id
   public get anneeid(): any {
     return this._anneeid;
   }

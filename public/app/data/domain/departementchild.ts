@@ -14,6 +14,7 @@ class DepartementChildItem extends DescriptionItem implements InfoData.IDepartem
       }
     }// oMap
   }// constructor
+  
   public get departementid(): any {
     return this._departementid;
   }

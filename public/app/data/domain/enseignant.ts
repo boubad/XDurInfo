@@ -14,5 +14,8 @@ class Enseignant extends DepartementPerson implements InfoData.IEnseignant {
   public get collection_name(): string {
     return 'enseignants';
   }
+  public create_id():  string{
+    return 'PRF-' + this.departementid + '-' + this.personid;
+  }// create_id
 }// class Etudiant
 export = Enseignant;

@@ -48,6 +48,11 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
       }
     }// oMap
   }// constructor
+  public create_id():  string{
+    return 'GVT-' +  this.date.toISOString() + '-' +
+     this.profaffectationid + '-' + this.genre + '-' +
+    (new Date()).toISOString();
+  }// create_id
   public get type(): string {
     return 'groupeevent';
   }

@@ -25,6 +25,10 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
       }
     }// oMap
   }// constructor
+  public create_id():  string{
+    return 'AFP-' + this.semestreid + '-' + this.matiereid +
+    '-' + this.enseignantid + '-' + this.groupeid + '-' + (new Date()).toISOString();
+  }// create_id
   //
   public get matiereid(): any {
     return this._matiereid;

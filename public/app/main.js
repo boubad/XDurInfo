@@ -10,6 +10,8 @@ requirejs.config({
     'bootstrap': '../lib/bootstrap/js/bootstrap',
     'jquery': '../lib/jquery/jquery-1.9.1',
     'q': '../lib/q/q',
+    'pouchdb':'../lib/pouchdb/pouchdb-3.3.1.min',
+    'pouchdb-find':'../lib/pouchdb/pouchdb.find.min',
     'moment': '../lib/moment/moment',
     'domain':'./data/domain',
     'model':'./data/model',
@@ -23,11 +25,15 @@ requirejs.config({
     },
     'q': {
       exports: 'Q'
+    },
+    'pouchdb':{
+      exports: 'PouchDB'
     }
   }
 });
 
-define(['q','durandal/system', 'durandal/app', 'durandal/viewLocator'], function(Q,system, app, viewLocator) {
+define(['q','pouchdb','durandal/system', 'durandal/app', 'durandal/viewLocator'],
+ function(Q,PouchDB,system, app, viewLocator) {
   //>>excludeStart("build", true);
   system.debug(true);
   //>>excludeEnd("build");

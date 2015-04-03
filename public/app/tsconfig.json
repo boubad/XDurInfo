@@ -45,6 +45,7 @@
         "./data/domain/siglenameitem.ts",
         "./data/domain/unite.ts",
         "./data/itemgenerator.ts",
+        "./data/local/couchlocaldatabase.ts",
         "./data/model/anneeviewmodel.ts",
         "./data/model/baseviewmodel.ts",
         "./data/model/departementsiglenameviewmodel.ts",
@@ -64,6 +65,7 @@
         "./data/store/objectid.ts",
         "./data/test/basedatastore-test.ts",
         "./data/test/baseitem-test.ts",
+        "./data/test/couchlocaldatabase-test.ts",
         "./data/test/departementmanager-test.ts",
         "./data/test/dummyTest.ts",
         "./data/test/infohttpmanager.ts",
@@ -78,6 +80,7 @@
         "../lib/typings/jquery/jquery.d.ts",
         "../lib/typings/knockout/knockout.d.ts",
         "../lib/typings/moment/moment.d.ts",
+        "../lib/typings/pouchdb/pouchdb.d.ts",
         "../lib/typings/q/Q.d.ts",
         "../lib/typings/qunit/qunit.d.ts"
     ]

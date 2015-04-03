@@ -4,45 +4,47 @@
 export interface IBaseItem {
   id: any;
   rev: any;
+  attachments: any;
   type: string;
   localmode: string;
   collection_name: string;
   //
+  create_id: () => string;
   has_id: boolean;
   has_rev: boolean;
   is_storeable: boolean;
   //
   to_insert_map: (oMap: any) => void;
   to_fetch_map: (oMap: any) => void;
-  sort_func : (p1:IBaseItem, p2:IBaseItem) => number;
+  sort_func: (p1: IBaseItem, p2: IBaseItem) => number;
   //
-  sigle?:string;
-  name?:string;
-  description?:string;
-  departementid?:any;
-  anneeid?:any;
-  semestreid?:any;
-  uniteid?:any;
-  matiereid?:any;
-  groupeid?:any;
-  startDate?:Date;
-  endDate?:Date;
-  genre?:string;
-  mat_module?:string;
-  coefficient?:number;
-  ecs?:number;
-  personid?:any;
-  avatarid?:any;
-  fullname?:string;
-  date?:Date;
-  location?:string;
-  startTime?:Date;
-  note?:number;
-  status?:string;
-  enseignantid?:any;
-  etudiantid?:any;
+  sigle?: string;
+  name?: string;
+  description?: string;
+  departementid?: any;
+  anneeid?: any;
+  semestreid?: any;
+  uniteid?: any;
+  matiereid?: any;
+  groupeid?: any;
+  startDate?: Date;
+  endDate?: Date;
+  genre?: string;
+  mat_module?: string;
+  coefficient?: number;
+  ecs?: number;
+  personid?: any;
+  avatarid?: any;
+  fullname?: string;
+  date?: Date;
+  location?: string;
+  startTime?: Date;
+  note?: number;
+  status?: string;
+  enseignantid?: any;
+  etudiantid?: any;
   profaffectationid?: any;
-  etudaffectationid?:any;
+  etudaffectationid?: any;
   username?: string;
   password?: string;
   firstname?: string;
@@ -199,11 +201,11 @@ export interface IDepartementChild extends IDescriptionItem {
   has_departementid: boolean;
 }// interface IDepartementChild
 
-export interface IDepartementSigleNameItem extends ISigleNameItem  {
-  departementid:any;
-  has_departementid:boolean;
+export interface IDepartementSigleNameItem extends ISigleNameItem {
+  departementid: any;
+  has_departementid: boolean;
 }// interface IDepartement
-export interface IIntervalItem extends IDepartementSigleNameItem  {
+export interface IIntervalItem extends IDepartementSigleNameItem {
   startDate: Date;
   endDate: Date;
   //
@@ -265,7 +267,7 @@ export interface IAffectation extends IDepartementChild {
   has_personid: boolean;
   has_startDate: boolean;
   has_endDate: boolean;
-  has_fullname : boolean;
+  has_fullname: boolean;
 } // interface IAffectation
 export interface IEtudAffectation extends IAffectation {
   etudiantid: any;
@@ -338,15 +340,15 @@ export interface IEtudEvent extends IBaseEvent {
 }// interface IGroupeEvent
 //
 export interface IStoreManagerImpl {
-  perform_get: (id:any) => Q.IPromise<any>;
+  perform_get: (id: any) => Q.IPromise<any>;
   perfom_remove: (id: any) => Q.IPromise<any>;
-  perform_store: (id:any, data:any) => Q.IPromise<any>;
+  perform_store: (id: any, data: any) => Q.IPromise<any>;
 }// interface IStoreManager
 //
 export interface IObjectStore {
-  get_value: (id:any) => Q.IPromise<IBaseItem>;
+  get_value: (id: any) => Q.IPromise<IBaseItem>;
   store_value: (item: IBaseItem) => Q.IPromise<any>;
-  remove_value: (id:any) => Q.IPromise<any>;
+  remove_value: (id: any) => Q.IPromise<any>;
 }// interface IObjectStore
 //
 export interface IHttpManager {
@@ -366,11 +368,25 @@ export interface IDataManager {
   update_one_item: (item: IBaseItem) => Q.IPromise<any>;
   maintains_one_item: (item: IBaseItem) => Q.IPromise<any>;
   remove_one_item: (item: IBaseItem) => Q.IPromise<any>;
-  get_items_array : (item:IBaseItem, ids:any[]) => Q.IPromise<IBaseItem[]>;
+  get_items_array: (item: IBaseItem, ids: any[]) => Q.IPromise<IBaseItem[]>;
 }// interface IDataManager
 export interface IMenuDesc {
-  refer:string;
-  title:string;
-  desc?:string;
-  source?:string;
+  refer: string;
+  title: string;
+  desc?: string;
+  source?: string;
 }
+export interface IDatabaseManager {
+  isConnected: () => Q.IPromise<boolean>;
+  get_item_by_id: (id: string) => Q.IPromise<IBaseItem>;
+  get_items_array: (ids: string[]) => Q.IPromise<IBaseItem[]>;
+  maintains_one_item: (item: IBaseItem) => Q.IPromise<IBaseItem>;
+  maintains_items: (items: IBaseItem[]) => Q.IPromise<IBaseItem[]>;
+  remove_items: (items: IBaseItem[]) => Q.IPromise<boolean>
+  remove_one_item: (item: IBaseItem) => Q.IPromise<boolean>;
+  get_items_range: (startKey: string, endKey: string, limit?: number,
+  descending?: boolean) => Q.IPromise<IBaseItem[]>;
+  get_items_count: (startKey: string, endKey:string) => Q.IPromise<number>;
+  find_person_by_username :(username:string) => Q.IPromise<IBaseItem>;
+  create_design_docs: () => Q.IPromise<boolean>;
+}// interface IDatabaseManager

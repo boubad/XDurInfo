@@ -14,5 +14,8 @@ class Operator extends DepartementPerson implements InfoData.IOperator {
   public get collection_name(): string {
     return 'operators';
   }
+  public create_id():  string{
+    return 'OPR-' + this.departementid + '-' + this.personid;
+  }// create_id
 }// class Operator
 export = Operator;

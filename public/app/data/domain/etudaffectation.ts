@@ -15,6 +15,10 @@ class EtudAffectation extends Affectation implements InfoData.IEtudAffectation {
       }
     }// oMap
   }// constructor
+  public create_id():  string{
+    return 'EFP-' + this.semestreid + '-' + this.groupeid +
+    '-' + this.etudiantid + '-' + (new Date()).toISOString();
+  }// create_id
   //
   public get etudiantid(): any {
     return this._etudiantid;

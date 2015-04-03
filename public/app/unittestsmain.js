@@ -11,6 +11,8 @@ require.config({
         'bootstrap': '../lib/bootstrap/js/bootstrap',
         'jquery': '../lib/jquery/jquery-1.9.1',
         'q': '../lib/q/q',
+        'pouchdb':'../lib/pouchdb/pouchdb-3.3.1.min',
+        'pouchdb-find':'../lib/pouchdb/pouchdb.find.min',
         'moment': '../lib/moment/moment',
         'domain':'./data/domain',
         'model':'./data/model',
@@ -24,6 +26,9 @@ require.config({
       },
        'q': {
          exports: 'Q'
+       },
+       'pouchdb':{
+         exports: 'PouchDB'
        },
        'knockout':{
          exports: 'ko'
@@ -40,8 +45,8 @@ require.config({
 
 // require the unit tests.
 require(
-    ['q','QUnit','test/departementmanager-test'],
-    function(Q,QUnit, mytest) {
+    ['q','pouchdb','QUnit','test/couchlocaldatabase-test'],
+    function(Q,PouchDB,QUnit, mytest) {
         // run the tests.
         //dummyTest.run();
         mytest.run();
