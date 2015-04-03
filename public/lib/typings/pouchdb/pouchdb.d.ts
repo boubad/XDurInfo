@@ -275,13 +275,17 @@ interface PouchOptions {
 	adapter?: string;
 	ajax?:PouchAjaxOptions;
 }
-
+interface IPouchFuncs {
+	enable : (v:string) => void;
+	disable : () => void;
+}
 interface PouchDB extends PouchApi {
     new (name: string, opts: PouchOptions, callback: (err: PouchError, res: PouchDB) => void): PouchDB;
     new (name: string, callback: (err: PouchError, res: PouchDB) => void): PouchDB;
     new (name: string): PouchDB;
 	destroy(name: string, callback: (err: PouchError) => void): void;
 	plugin : (p:any) => void;
+	debug? : IPouchFuncs;
 }
 
 declare var PouchDB: PouchDB;

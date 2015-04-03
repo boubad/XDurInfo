@@ -42,11 +42,11 @@ require.config({
        }
     }
 });
-
 // require the unit tests.
 require(
     ['q','pouchdb','QUnit','test/couchlocaldatabase-test'],
     function(Q,PouchDB,QUnit, mytest) {
+        PouchDB.debug.enable('*');
         // run the tests.
         //dummyTest.run();
         mytest.run();

@@ -19,16 +19,27 @@ requirejs.config({
     'test':'./data/test'
   },
   shim: {
-    'bootstrap': {
-      deps: ['jquery'],
-      exports: 'jQuery'
-    },
-    'q': {
-      exports: 'Q'
-    },
-    'pouchdb':{
-      exports: 'PouchDB'
-    }
+     'q': {
+         exports: 'Q'
+       },
+        'jquery':{
+            deps:['q'],
+            exports:'jquery'
+        },
+      'bootstrap': {
+        deps: ['jquery'],
+        exports: 'jQuery'
+      },
+       'pouchdb':{
+         deps:['q'],  
+         exports: 'PouchDB'
+       },
+       'pouchdb-find':{
+           deps:['pouchdb']
+       },
+       'knockout':{
+         exports: 'ko'
+       }
   }
 });
 
