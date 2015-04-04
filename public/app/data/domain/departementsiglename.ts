@@ -15,9 +15,9 @@ class DepartementSigleNameItem extends SigleNameItem implements InfoData.ISigleN
       }
     }// oMap
   }// constructor
-  public create_id():  string{
-    return this.departementid + '-' + this.sigle;
-  }// create_id
+  public get search_prefix(): string {
+    return this.base_prefix + '-' + this.departementid;
+  }
   public get departementid(): any {
     return this._departementid;
   }

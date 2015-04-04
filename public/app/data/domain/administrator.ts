@@ -14,8 +14,8 @@ class Administrator extends DepartementPerson implements InfoData.IAdministrator
   public get collection_name(): string {
     return 'administrators';
   }
-  public create_id():  string{
-    return 'ADM-' + this.departementid + '-' + this.personid;
-  }// create_id
+  public get base_prefix(): string {
+    return 'ADM';
+  }
 }// class Administrator
 export = Administrator;

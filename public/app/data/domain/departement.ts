@@ -14,8 +14,11 @@ class Departement extends SigleNameItem implements InfoData.IDepartement {
   public get collection_name(): string {
     return 'departements';
   }
-  public create_id():  string{
-    return 'DEP-' + this.sigle.toUpperCase();
-  }// create_id
+  public get base_prefix(): string {
+    return 'DEP';
+  }
+  public get index_name():string{
+    return this.collection_name + '/by_sigle';
+  }
 } // class Departement
 export = Departement;

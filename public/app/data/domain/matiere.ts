@@ -35,9 +35,9 @@ class Matiere extends DepartementSigleNameItem implements InfoData.IMatiere {
       }
     }// oMap
   } // constructor
-  public create_id():  string{
-    return 'MAT-' + this.uniteid + '-' + this.sigle.toUpperCase();
-  }// create_id
+  public get base_prefix(): string {
+    return 'MAT';
+  }
   public get type(): string {
     return 'matiere';
   }

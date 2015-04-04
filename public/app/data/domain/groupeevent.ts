@@ -48,8 +48,15 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
       }
     }// oMap
   }// constructor
+  public get base_prefix():string {
+    return 'GVT';
+  }
+  public get search_prefix(): string {
+    return this.base_prefix + '-' + this.semestreid + '-' + this.matiereid +
+    '-' + this.groupeid;
+  }
   public create_id():  string{
-    return 'GVT-' +  this.date.toISOString() + '-' +
+    return this.search_prefix +  this.date.toISOString() + '-' +
      this.profaffectationid + '-' + this.genre + '-' +
     (new Date()).toISOString();
   }// create_id

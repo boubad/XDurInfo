@@ -64,6 +64,10 @@ class BaseEvent extends DepartementChild implements InfoData.IBaseEvent {
     }// oMap
   }// constructor
   //
+  public get search_prefix(): string {
+    return this.base_prefix + '-' + this.semestreid + '-' + this.groupeid;
+  }
+  //
   public get documentids(): any[] {
     return ((this._docs !== undefined) && (this._docs !== null)) ?
      this._docs : [];

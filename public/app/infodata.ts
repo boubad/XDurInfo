@@ -8,8 +8,11 @@ export interface IBaseItem {
   type: string;
   localmode: string;
   collection_name: string;
+  index_name:string;
   //
   create_id: () => string;
+  base_prefix:string;
+  search_prefix : string;
   has_id: boolean;
   has_rev: boolean;
   is_storeable: boolean;
@@ -337,13 +340,7 @@ export interface IEtudEvent extends IBaseEvent {
   has_groupeeventid: boolean;
   has_note: boolean;
   has_etudiantid: boolean;
-}// interface IGroupeEvent
-//
-export interface IStoreManagerImpl {
-  perform_get: (id: any) => Q.IPromise<any>;
-  perfom_remove: (id: any) => Q.IPromise<any>;
-  perform_store: (id: any, data: any) => Q.IPromise<any>;
-}// interface IStoreManager
+}// interface IEtudEvent
 //
 export interface IObjectStore {
   get_value: (id: any) => Q.IPromise<IBaseItem>;
@@ -351,30 +348,11 @@ export interface IObjectStore {
   remove_value: (id: any) => Q.IPromise<any>;
 }// interface IObjectStore
 //
-export interface IHttpManager {
-  perform_get: (url: string) => Q.IPromise<any>;
-  perform_post: (url: string, data: any) => Q.IPromise<any>;
-  perform_put: (url: string, data: any) => Q.IPromise<any>;
-  perform_remove: (url: string) => Q.IPromise<any>;
-}// interface IHttpManager
-//
-export interface IDataManager {
-  create_item: (oMap: any) => IBaseItem;
-  get_items_count: (item: IBaseItem) => Q.IPromise<number>;
-  get_items: (item: IBaseItem, skip?: number, limit?: number) => Q.IPromise<IBaseItem[]>;
-  get_one_item: (item: IBaseItem) => Q.IPromise<IBaseItem>;
-  get_by_id: (item: IBaseItem) => Q.IPromise<IBaseItem>;
-  insert_one_item: (item: IBaseItem) => Q.IPromise<any>;
-  update_one_item: (item: IBaseItem) => Q.IPromise<any>;
-  maintains_one_item: (item: IBaseItem) => Q.IPromise<any>;
-  remove_one_item: (item: IBaseItem) => Q.IPromise<any>;
-  get_items_array: (item: IBaseItem, ids: any[]) => Q.IPromise<IBaseItem[]>;
-}// interface IDataManager
 export interface IMenuDesc {
   refer: string;
   title: string;
   desc?: string;
-  source?: string;
+  img_source?: string;
 }
 export interface IDatabaseManager {
   isConnected: () => Q.IPromise<boolean>;
@@ -384,9 +362,8 @@ export interface IDatabaseManager {
   maintains_items: (items: IBaseItem[]) => Q.IPromise<IBaseItem[]>;
   remove_items: (items: IBaseItem[]) => Q.IPromise<boolean>
   remove_one_item: (item: IBaseItem) => Q.IPromise<boolean>;
-  get_items_range: (startKey: string, endKey: string, limit?: number,
-  descending?: boolean) => Q.IPromise<IBaseItem[]>;
-  get_items_count: (startKey: string, endKey:string) => Q.IPromise<number>;
+  get_items_range: (item:IBaseItem,startKey?: string, endKey?: string, skip?:number,limit?: number,
+  descending?: boolean,bIncludeEnd?:boolean) => Q.IPromise<IBaseItem[]>;
+  get_items_count: (item:IBaseItem,startKey?: string, endKey?:string) => Q.IPromise<number>;
   find_person_by_username :(username:string) => Q.IPromise<IBaseItem>;
-  create_design_docs: () => Q.IPromise<boolean>;
 }// interface IDatabaseManager

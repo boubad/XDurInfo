@@ -67,10 +67,15 @@ interface PouchGetResponse {
 
 interface PouchAllDocsOptions {
 	startkey?: string;
-	endKey?: string;
+	endkey?: string;
 	descending?: boolean;
 	include_docs?: boolean;
 	conflicts?: boolean;
+	skip?:number;
+	limit?:number;
+	keys?:any[];
+	inclusive_end?:boolean;
+	attachments?:boolean;
 }
 
 interface PouchAllDocsItem {

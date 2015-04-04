@@ -45,6 +45,9 @@ class Affectation extends DepartementChild implements InfoData.IAffectation {
       }
     }// oMap
   }// constructor
+  public get search_prefix(): string {
+    return this.base_prefix + '-' + this.semestreid;
+  }
   public get fullname(): string {
     return this._fullname;
   }

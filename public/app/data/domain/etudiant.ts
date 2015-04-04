@@ -14,8 +14,8 @@ class Etudiant extends DepartementPerson implements InfoData.IEtudiant {
   public get collection_name(): string {
     return 'etudiants';
   }
-  public create_id():  string{
-    return 'ETD-' + this.departementid + '-' + this.personid;
-  }// create_id
+  public get base_prefix(): string {
+    return 'ETD';
+  }
 }// class Etudiant
 export = Etudiant;

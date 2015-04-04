@@ -14,8 +14,8 @@ class Annee extends IntervalItem implements InfoData.IAnnee {
   public get collection_name(): string {
     return 'annees';
   }
-  public create_id():  string{
-    return 'AN-' + this.departementid + '-' + this.startDate.toISOString();
-  }// create_id
+  public get base_prefix(): string {
+    return 'ANN';
+  }
 } // class Annee
 export = Annee;

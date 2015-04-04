@@ -14,8 +14,8 @@ class Unite extends DepartementSigleNameItem implements InfoData.IUnite {
   public get collection_name(): string {
     return 'unites';
   }
-  public create_id():  string{
-    return 'UN-' + this.departementid + '-' + this.sigle.toUpperCase();
-  }// create_id
+  public get base_prefix(): string {
+    return 'UNT';
+  }
 } // class Groupe
 export = Unite;

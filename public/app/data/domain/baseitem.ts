@@ -31,9 +31,21 @@ class BaseItem implements InfoData.IBaseItem {
       }
     }
   }// constructor
+  public get index_name():string{
+    return this.collection_name + '/by_id';
+  }
   public create_id():  string{
-    return (new Date()).toISOString();
+    var n:number = Math.floor(Math.random() * 10000.0);
+    var s:string = (new Date()).toISOString() + '-' + n;
+    var ss = this.search_prefix + '-' + s;
+    return ss;
   }// create_id
+  public get base_prefix(): string {
+    return '';
+  }
+  public get search_prefix(): string {
+    return this.base_prefix;
+  }
   public static get date_format(): string {
     return 'YYYY-MM-DD';
   }

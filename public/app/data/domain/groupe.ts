@@ -14,8 +14,8 @@ class Groupe extends DepartementSigleNameItem  implements InfoData.IGroupe {
   public get collection_name(): string {
     return 'groupes';
   }
-  public create_id():  string{
-    return 'GRP-' + this.departementid + '-' + this.sigle.toUpperCase();
-  }// create_id
+  public get base_prefix(): string {
+    return 'GRP';
+  }
 } // class Groupe
 export = Groupe;

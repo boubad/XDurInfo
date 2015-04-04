@@ -85,8 +85,14 @@ class Person extends DescriptionItem implements InfoData.IPerson {
     } // oMap
   } // constructor
   //
+  public get base_prefix(): string {
+    return 'PER';
+  }
+  public get index_name():string {
+    return 'persons/by_username';
+  }
   public create_id():  string{
-    return this.lastname + '-' + this.firstname + '-' + this.username;
+    return this.base_prefix + '-' + this.username;
   }// create_id
   //
   public get departementids(): any[] {

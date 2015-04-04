@@ -72,79 +72,42 @@ class CouchDatabase extends ItemGenerator
       }
     });
   }// open
-  public create_design_docs(): Q.IPromise<boolean> {
+  public _maintains_doc(ddoc: any): Q.IPromise<PouchUpdateResponse> {
     return Q.Promise((resolve, reject) => {
       this.open().then((db) => {
-        var rev = null;
-        db.get('_design/persons').then((r)=>{
-          if ((r !== null) && (r !== null)){
-            resolve(true);
-          } else {
-            this.create_persons_design_docs(rev).then((x)=>{
-              resolve(true);
-            },(e)=>{
-              reject(e);
+        var id = ddoc._id;
+        db.get(id).then((r) => {
+          ddoc._rev = r._rev;
+          db.put(ddoc).then((rx) => {
+            resolve(rx);
+          }, (ex) => {
+              if (ex.status == 409) {
+                resolve({ id: id, ok: false, rev: null });
+              } else {
+                reject(ex);
+              }
             });
-          }
-        },(ex)=>{
-          this.create_persons_design_docs().then((x)=>{
-            resolve(true);
-          },(e)=>{
-            reject(e);
-          });
-        });
-      }, (err) => {
-          reject(err);
-        });
-    });
-  }//create_design_docs
-  public create_persons_design_docs(rev?:string): Q.IPromise<boolean> {
-    return Q.Promise((resolve, reject) => {
-      this.open().then((db) => {
-        var ddoc = {
-          _id: '_design/persons',
-          views:{
-            by_username:{
-              map: function(doc) {
-                if (doc.type !== undefined){
-                  if ((doc.type == 'person') || (doc.type == 'profperson') ||
-                  (doc.type == 'etudperson') || (doc.type == 'operperson') ||
-                  (doc.type == 'adminperson')){
-                    if (doc.username !== undefined){
-                       var name = doc.lastname + ' ' + doc.firstname;
-                      emit(doc.username, name);
-                    }
+        }, (e1) => {
+            if (e1.status == 404) {
+              db.put(ddoc).then((rx) => {
+                resolve(rx);
+              }, (ex) => {
+                  if (ex.status == 409) {
+                    resolve({ id: id, ok: false, rev: null });
+                  } else {
+                    reject(ex);
                   }
-                }
-              }.toString()
+                });
+            } else {
+              reject(e1);
             }
-          }
-        };
-        if ((rev !== undefined) && (rev !== null)){
-          ddoc['_rev'] = rev;
-        }
-        db.put(ddoc).then((r)=>{
-          db.query('persons/by_username',{limit:0}).then((r)=>{
-            resolve(true);
-          },(ex)=>{
-            reject(ex);
           });
-        },(e)=>{
-          if (e.status == '409'){
-            db.query('persons/by_username',{limit:0}).then((r)=>{
-              resolve(true);
-            },(ex)=>{
-              reject(ex);
-            });
-          } else {
-            reject(e);
-          }
-        });
       }, (err) => {
           reject(err);
         });
     });
-  }//create_persons_design_docs
+  }// __maintains_doc
+
   public isConnected(): Q.IPromise<boolean> {
     return Q.Promise((resolve, reject) => {
       this.open().then((db) => {
@@ -159,94 +122,119 @@ class CouchDatabase extends ItemGenerator
     });
   }// isConnected
   //
-  public get_items_range(startKey:string, endKey:string, limit?:number,
-    descending?:boolean) : Q.IPromise<InfoData.IBaseItem[]> {
-      return Q.Promise((resolve, reject) => {
-        var count = ((limit !== undefined) && (limit !== null) &&
-        (limit > 0)) ? limit : 16;
-        var bSort = ((descending !== undefined) && (descending !== null)) ?
-        descending : false;
-        var options = {startkey:startKey, endkey:endKey,
-         include_docs:true, limit: count, attachments:true};
-         if (bSort){
-           options['descending'] = true;
-         }
-         var oRet:InfoData.IBaseItem[] = [];
-         this.open().then((db) => {
-           db.allDocs(options).then((rr) => {
-             if ((rr !== undefined) && (rr !== null)) {
-               var oMaps:any[] = [];
-               var data = rr.rows;
-               if ((data !== undefined) && (data !== null)) {
-                 var n = data.length;
-                 for (var i = 0; i < n; ++i) {
-                   var r = data[i];
-                   var val = r.value;
-                   if ((val !== undefined) && (val !== null)) {
-                     if ((val.deleted === undefined) && (val.error === undefined)) {
-                       var oMap = this.create_item(r.doc);
-                       if (oMap !== null) {
-                         oMaps.push(oMap);
-                       }
-                     }
-                   }
-                 }// i
-               }// data
-             }// rr
-             oRet = this.convert_items(oMaps);
-             resolve(oRet);
-           }, (e) => {
-               reject(e);
-             });
-         }, (err) => {
-             reject(err);
-           });
-      });
+  public get_items_range(item:InfoData.IBaseItem,startKey?: string, endKey?: string,
+    skip?: number, limit?: number,
+    descending?: boolean,bIncludeEnd?:boolean): Q.IPromise<InfoData.IBaseItem[]> {
+    return Q.Promise((resolve, reject) => {
+      var indexName = item.index_name;
+      var options: PouchAllDocsOptions = {
+        include_docs: true, attachments: true
+      };
+      if ((bIncludeEnd !== undefined) && (bIncludeEnd !== null)){
+        options.inclusive_end = bIncludeEnd;
+      }
+      if ((startKey !== undefined) && (startKey !== null)){
+        options.startkey = startKey;
+      }
+      if ((limit !== undefined) && (limit !== null) &&
+        (limit > 0)) {
+        options.limit = limit;
+      }
+      if ((descending !== undefined) && (descending !== null)) {
+        options.descending = descending;
+      }
+      if ((endKey != undefined) && (endKey !== null)) {
+        options.endkey = endKey;
+      }
+      if ((skip !== undefined) && (skip !== null) && (skip > 0)) {
+        options.skip = skip;
+      }
+      var oRet: InfoData.IBaseItem[] = [];
+      this.open().then((db) => {
+        db.query(indexName,options).then((rr) => {
+          if ((rr !== undefined) && (rr !== null)) {
+            var oMaps: any[] = [];
+            var data = rr.rows;
+            if ((data !== undefined) && (data !== null)) {
+              var n = data.length;
+              for (var i = 0; i < n; ++i) {
+                var r = data[i];
+                var val = r.value;
+                if ((val !== undefined) && (val !== null)) {
+                  if ((val.deleted === undefined) && (val.error === undefined)) {
+                    var oMap = this.create_item(r.doc);
+                    if (oMap !== null) {
+                      oMaps.push(oMap);
+                    }
+                  }
+                }
+              }// i
+            }// data
+          }// rr
+          oRet = this.convert_items(oMaps);
+          resolve(oRet);
+        }, (e) => {
+            reject(e);
+          });
+      }, (err) => {
+          reject(err);
+        });
+    });
   }//get_items_range
   //
-  public get_items_count(startKey:string, endKey:string) : Q.IPromise<number> {
-      return Q.Promise((resolve, reject) => {
-        var options = {startkey:startKey, endkey:endKey};
-         var oRet:number = 0;
-         this.open().then((db) => {
-           db.allDocs(options).then((rr) => {
-             if ((rr !== undefined) && (rr !== null)) {
-               var oMaps:any[] = [];
-               var data = rr.rows;
-               if ((data !== undefined) && (data !== null)) {
-                  oRet = data.length;
-               }// data
-             }// rr
-             resolve(oRet);
-           }, (e) => {
-               reject(e);
-             });
-         }, (err) => {
-             reject(err);
-           });
-      });
-  }//get_items_count
-  public find_person_by_username(username:string) : Q.IPromise<InfoData.IBaseItem> {
-    var suser = ((username !== undefined) && (username !== null)) ?
-    username.trim().toLowerCase(): null;
+  public get_items_count(item:InfoData.IBaseItem,startKey?: string, endKey?: string): Q.IPromise<number> {
     return Q.Promise((resolve, reject) => {
-      if (suser=== null) {
+      var indexName = item.index_name;
+      var options: PouchAllDocsOptions = {
+      };
+      if ((startKey !== null) && (startKey !== null)){
+        options.startkey = startKey;
+      }
+      if ((endKey !== undefined) && (endKey !== null)) {
+        options.endkey = endKey;
+      }
+      var oRet: number = 0;
+      this.open().then((db) => {
+        db.query(indexName,options).then((rr) => {
+          if ((rr !== undefined) && (rr !== null)) {
+            var oMaps: any[] = [];
+            var data = rr.rows;
+            if ((data !== undefined) && (data !== null)) {
+              oRet = data.length;
+            }// data
+          }// rr
+          resolve(oRet);
+        }, (e) => {
+            reject(e);
+          });
+      }, (err) => {
+          reject(err);
+        });
+    });
+  }//get_items_count
+  public find_person_by_username(username: string): Q.IPromise<InfoData.IBaseItem> {
+    var suser = ((username !== undefined) && (username !== null)) ?
+      username.trim().toLowerCase() : null;
+    return Q.Promise((resolve, reject) => {
+      if (suser === null) {
         resolve(null);
       } else {
         this.open().then((db) => {
           db.query("persons/by_username",
-          { include_docs:true, key: suser,
-             attachments: true }).then((r) => {
-            if ((r !== undefined) && (r !== null) &&
-            (r.rows !== undefined) && (r.rows !== null) &&
-            (r.rows.length > 0)){
-              var v = r.rows[0];
-              var x = this.create_item(v.doc);
-              resolve(x);
-            } else {
-              resolve(null);
-            }
-          }, (e) => {
+            {
+              include_docs: true, key: suser,
+              attachments: true
+            }).then((r) => {
+              if ((r !== undefined) && (r !== null) &&
+                (r.rows !== undefined) && (r.rows !== null) &&
+                (r.rows.length > 0)) {
+                var v = r.rows[0];
+                var x = this.create_item(v.doc);
+                resolve(x);
+              } else {
+                resolve(null);
+              }
+            }, (e) => {
               resolve(null);
             });
         }, (err) => {
@@ -284,7 +272,7 @@ class CouchDatabase extends ItemGenerator
         this.open().then((db) => {
           db.allDocs({ keys: ids, include_doc: true, attachments: true }).then((rr) => {
             if ((rr !== undefined) && (rr !== null)) {
-              var oMaps:any[] = [];
+              var oMaps: any[] = [];
               var data = rr.rows;
               if ((data !== undefined) && (data !== null)) {
                 var n = data.length;
@@ -316,57 +304,46 @@ class CouchDatabase extends ItemGenerator
   //
   public maintains_one_item(item: InfoData.IBaseItem):
     Q.IPromise<InfoData.IBaseItem> {
-    return Q.Promise((resolve, reject) => {
-      if ((item === undefined) || (item === null)) {
-        reject({
-          status: 2000,
-          error: 'Invalid input argument',
-          reason: 'CouchDatabase maintains_one_item error'
+    if ((item === undefined) || (item === null)) {
+      return Q.reject({
+        status: 2000,
+        error: 'Invalid input argument',
+        reason: 'CouchDatabase maintains_one_item error'
+      });
+    } else if (!item.is_storeable) {
+      return Q.reject({
+        status: 2001,
+        error: 'Item not storeable: ' + item.toString(),
+        reason: 'CouchDatabase maintains_one_item error'
+      });
+    }
+    var oMap = {};
+    item.to_insert_map(oMap);
+    var id = item.id;
+    if ((id !== null) && (item.rev === null)) {
+      return Q.reject({
+        status: 2009,
+        error: 'Missing rev number: ' + item.toString(),
+        reason: 'CouchDatabase maintains_one_item error'
+      });
+    }
+    if (id === null){
+      id = item.create_id();
+      oMap['_id'] = id;
+    }
+    return Q.Promise((resolve,reject)=>{
+      this._maintains_doc(oMap).then((r)=>{
+        this.get_item_by_id(id).then((rr)=>{
+          resolve(rr);
+        },(ex)=>{
+          reject(ex);
         });
-      } else if (!item.is_storeable) {
-        reject({
-          status: 2001,
-          error: 'Item not storeable: ' + item.toString(),
-          reason: 'CouchDatabase maintains_one_item error'
-        });
-      } else {
-        var oMap = {};
-        item.to_insert_map(oMap);
-        this.open().then((db) => {
-          var id = item.id;
-          if (id === null) {
-            oMap['_id'] = item.create_id();
-          } else {
-            oMap['_id'] = id;
-            oMap['_rev'] = item.rev;
-          }
-          db.put(oMap).then((r) => {
-            if ((r !== undefined) && (r !== null) &&
-              (r.ok !== undefined) && (r.id !== undefined) &&
-              (r.rev !== undefined) && (r.ok == true)) {
-              item.id = r.id;
-              item.rev = r.rev;
-              resolve(item);
-            } else {
-              reject({
-                status: 2002,
-                error: 'Bad response ',
-                reason: 'CouchDatabase maintains_one_item error'
-              });
-            }
-          }, (e) => {
-              if (e.status == '409') {
-                resolve(item);
-              } else {
-                reject(e);
-              }
-            });
-        }, (err) => {
-            reject(err);
-          });
-      }
+      },(err)=>{
+        reject(err);
+      });
     });
-  }// maintains_one_item
+  }//maintains_one_item
+  //
   public maintains_items(items: InfoData.IBaseItem[]):
     Q.IPromise<InfoData.IBaseItem[]> {
     return Q.Promise((resolve, reject) => {
@@ -383,11 +360,14 @@ class CouchDatabase extends ItemGenerator
             item.to_insert_map(oMap);
             if (id === null) {
               oMap['_id'] = item.create_id();
+              oMaps.push(oMap);
             } else {
-              oMap['_id'] = id;
-              oMap['_rev'] = item.rev;
+              if (item.rev !== null) {
+                oMap['_id'] = id;
+                oMap['_rev'] = item.rev;
+                oMaps.push(oMap);
+              }
             }
-            oMaps.push(oMap);
           }// item
         }// i
       }// items
@@ -501,6 +481,6 @@ class CouchDatabase extends ItemGenerator
           });
       }
     });
-  }// maintains_one_item
+  }// remove_one_item
 }// class LocalCouchDatabase
 export = CouchDatabase;
