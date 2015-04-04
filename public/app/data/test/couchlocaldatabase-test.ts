@@ -10,54 +10,11 @@ import Annee = require('data/domain/annee');
 //
 var main = () => {
   //
-  /*
-  test(' insert persons', (assert) => {
-    var done = assert.async();
-    var url = 'http://localhost:5984/geninfo';
-    //var db = new CouchDatabase();
-    var db = new CouchDatabase(url);
-    var n = 128;
-    var dd: Person[] = [];
-    var mx = new BaseItem();
-    var p = new Person({
-      username:'admin',
-      lastname: 'System',
-      firstname: 'Administrator',
-      roles:['super','admin']
-    });
-    p.reset_password();
-    dd.push(p);
-    for (var i = 0; i < n; ++i) {
-      var j = i + 1;
-      var sj = '' + j;
-      while (sj.length < 3){
-        sj = '0' + sj;
-      }
-      var d = new Person({
-        username: 'pers' + sj,
-        lastname: 'lastname ' + sj,
-        firstname: 'firstname' + sj,
-        description: 'Description person ' + sj
-      });
-      d.reset_password();
-      dd.push(d);
-    }// i
-    db.maintains_items(dd).then((rr) => {
-      ok((rr !== undefined) && (rr !== null));
-      done();
-    }, (err) => {
-        ok(false, JSON.stringify(err));
-        done();
-      });
-  });
-  */
-  //
-
   test('Get all departement', (assert) => {
     var done = assert.async();
-    var url = 'http://localhost:5984/geninfo';
-    //var db = new CouchDatabase();
-    var db = new CouchDatabase(url);
+    //var url = 'http://localhost:5984/geninfo';
+    var db = new CouchDatabase();
+    //var db = new CouchDatabase(url);
     var model = new Departement();
     var startKey = model.search_prefix;
     db.get_items_range(model).then((dd) => {
@@ -76,9 +33,9 @@ var main = () => {
   });
   test('Get persons range ', (assert) => {
     var done = assert.async();
-    var url = 'http://localhost:5984/geninfo';
-    //var db = new CouchDatabase();
-    var db = new CouchDatabase(url);
+    //var url = 'http://localhost:5984/geninfo';
+    var db = new CouchDatabase();
+    //var db = new CouchDatabase(url);
     var model = new Person();
     var startKey = model.search_prefix;
     db.get_items_range(model,null,null,50,11,false).then((dd) => {
@@ -96,12 +53,11 @@ var main = () => {
       });
   });
 
-/*
   test('Fill departement children', (assert) => {
     var done = assert.async();
-    var url = 'http://localhost:5984/geninfo';
-    //var db = new CouchDatabase();
-    var db = new CouchDatabase(url);
+    //var url = 'http://localhost:5984/geninfo';
+    var db = new CouchDatabase();
+    //var db = new CouchDatabase(url);
     var depid = 'DEP-DEP01';
     var mm = 10;
     var bb = [];
@@ -150,9 +106,8 @@ var main = () => {
         done();
       });
   });
-  */
+  
   //
-  /*
   test(' isConnected',(assert)=>{
     var done = assert.async();
     var db = new CouchDatabase();
@@ -164,13 +119,12 @@ var main = () => {
       done();
     });
   });
-  */
-/*
+  /*
   test(' insert departements', (assert) => {
     var done = assert.async();
-    var url = 'http://localhost:5984/geninfo';
-    //var db = new CouchDatabase();
-    var db = new CouchDatabase(url);
+    //var url = 'http://localhost:5984/geninfo';
+    var db = new CouchDatabase();
+    //var db = new CouchDatabase(url);
     var n = 50;
     var dd: Departement[] = [];
     var mx = new BaseItem();
@@ -196,13 +150,51 @@ var main = () => {
         done();
       });
   });
-*/
-  /*
+   test(' insert persons', (assert) => {
+    var done = assert.async();
+    //var url = 'http://localhost:5984/geninfo';
+    var db = new CouchDatabase();
+    //var db = new CouchDatabase(url);
+    var n = 128;
+    var dd: Person[] = [];
+    var mx = new BaseItem();
+    var p = new Person({
+      username:'admin',
+      lastname: 'System',
+      firstname: 'Administrator',
+      roles:['super','admin']
+    });
+    p.reset_password();
+    dd.push(p);
+    for (var i = 0; i < n; ++i) {
+      var j = i + 1;
+      var sj = '' + j;
+      while (sj.length < 3){
+        sj = '0' + sj;
+      }
+      var d = new Person({
+        username: 'pers' + sj,
+        lastname: 'lastname ' + sj,
+        firstname: 'firstname' + sj,
+        description: 'Description person ' + sj
+      });
+      d.reset_password();
+      dd.push(d);
+    }// i
+    db.maintains_items(dd).then((rr) => {
+      ok((rr !== undefined) && (rr !== null));
+      done();
+    }, (err) => {
+        ok(false, JSON.stringify(err));
+        done();
+      });
+  });
+  
   test(' design documents',(assert)=>{
     var done = assert.async();
-    var url = 'http://localhost:5984/geninfo';
-    //var db = new CouchDatabase();
-    var db = new CouchDatabase(url);
+    //var url = 'http://localhost:5984/geninfo';
+    var db = new CouchDatabase();
+    //var db = new CouchDatabase(url);
     db.create_design_docs().then((bRet)=>{
       ok((bRet !== undefined) && (bRet !== null));
       done();
@@ -212,8 +204,6 @@ var main = () => {
     });
   });
   */
-  //
-  //
 };
 var run = { run: main };
 export = run;
