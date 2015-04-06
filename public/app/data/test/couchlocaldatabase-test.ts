@@ -26,7 +26,7 @@ var dbMode = 'local';
 
 //
 var main = () => {
- /*
+ 
   test('Get all matieres', (assert) => {
     var done = assert.async();
     var model = new Matiere();
@@ -45,7 +45,6 @@ var main = () => {
         done();
       });
   });
-*/
   /*
   test(' insert admins', (assert) => {
    var done = assert.async();
@@ -76,15 +75,19 @@ var main = () => {
        done();
      });
  });
- */
+*/
   //
-/*
+
   test(' find_person_by_id',(assert)=>{
     var done = assert.async();
     var username = 'PER-admin';
     var db = create_database();
     db.get_item_by_id(username).then((pPers)=>{
-      ok((pPers !== undefined) && (pPers !== null),'Found ' + pPers.toString());
+     if (pPers == null){
+        ok(true,'OOPS!!! not found')
+      } else {
+         ok((pPers !== undefined) && (pPers !== null),'Found ' + pPers.toString());
+      }
       done();
     },(err)=>{
       ok(false,JSON.stringify(err));
@@ -97,7 +100,11 @@ var main = () => {
     var username = 'boubad';
     var db = create_database();
     db.find_person_by_username(username).then((pPers)=>{
-      ok((pPers !== undefined) && (pPers !== null),'Found ' + pPers.toString());
+      if (pPers == null){
+        ok(true,'OOPS!!! not found')
+      } else {
+         ok((pPers !== undefined) && (pPers !== null),'Found ' + pPers.toString());
+      }
       done();
     },(err)=>{
       ok(false,JSON.stringify(err));
@@ -117,6 +124,7 @@ var main = () => {
       model.departementid = ddid;
       var start = [depid]
       var end = [depid,{}];
+      var db = create_database();
       db.get_items_range(model,start,end).then((pp)=>{
         ok((pp !== undefined) && (pp !== null),'annees length ' + pp.length);
         var n = pp.length;
@@ -134,10 +142,10 @@ var main = () => {
       done();
     });
   });
-*/
-/*
+
   test(' isConnected',(assert)=>{
     var done = assert.async();
+    var db = create_database();
     db.isConnected().then((bRet)=>{
       ok((bRet !== undefined) && (bRet !== null) && (bRet == true));
       done();
@@ -150,6 +158,7 @@ var main = () => {
     var done = assert.async();
     var model = new Departement();
     var startKey = model.search_prefix;
+    var db = create_database();
     db.get_items_range(model).then((dd) => {
       ok((dd !== undefined) && (dd !== null) && (dd.length >= 0), "response is an array");
       var n = dd.length;
@@ -168,6 +177,7 @@ var main = () => {
     var done = assert.async();
     var model = new Person();
     var startKey = model.search_prefix;
+    var db = create_database();
     db.get_items_count(model).then((dd) => {
       ok((dd !== undefined) && (dd !== null), "response is not null");
       ok(dd >= 0, 'persons count is ' + dd);
@@ -181,6 +191,7 @@ var main = () => {
     var done = assert.async();
     var model = new Person();
     var startKey = model.search_prefix;
+    var db = create_database();
     db.get_items_range(model,null,null,50,11,false).then((dd) => {
       ok((dd !== undefined) && (dd !== null) && (dd.length >= 0), "response is an array");
       var n = dd.length;
@@ -195,7 +206,7 @@ var main = () => {
         done();
       });
   });
-*/
+
 /*
   test(' insert departements', (assert) => {
     var done = assert.async();
@@ -261,8 +272,8 @@ var main = () => {
         done();
       });
   });
-*/
-
+  */
+/*
   test ('insert matieres',(assert)=>{
     var done = assert.async();
     var uniteid = 'UNT-DEP-DEP01-UN01';
@@ -302,7 +313,7 @@ var main = () => {
         done();
       });
   });
-  
+  */
 /*
   test('Fill departement children', (assert) => {
     var done = assert.async();
