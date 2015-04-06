@@ -5,17 +5,21 @@ import InfoData = require('../../infodata');
 //
 import moment = require('moment');
 //
+var AVATAR_NAME = 'avatar';
+//
 class BaseItem implements InfoData.IBaseItem {
   private _id: any;
   private _rev: any;
-  private _localmode:string;
   private _attachments:any;
+  private _avatarid:any;
+  private _url:any;
   //
   constructor(oMap?: any) {
     this._id = null;
     this._rev = null;
-    this._localmode = null;
     this._attachments = null;
+    this._avatarid = null;
+    this._url = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap._id !== undefined) {
         this.id = oMap._id;
@@ -23,14 +27,37 @@ class BaseItem implements InfoData.IBaseItem {
       if (oMap._rev !== undefined) {
         this.rev = oMap._rev;
       }
-      if (oMap.localmode !== undefined){
-        this.localmode = oMap.localmode;
+      if (oMap.avatarid !== undefined){
+        this.avatarid = oMap.avatarid;
       }
       if (oMap._attachments !== undefined){
         this.attachments = oMap._attachments;
       }
     }
   }// constructor
+  public get avatarurl():any {
+    return this._url;
+  }
+  public set avatarurl(s:any){
+    this._url = s;
+  }
+  public get has_avatarurl():boolean {
+    return (this.avatarurl !== null);
+  }
+  public get avatarid():any {
+    if ((this._avatarid !== undefined) && (this._avatarid !== null) &&
+    (this._avatarid.toString().trim().length > 0)){
+      return this._avatarid;
+    }
+    return null;
+  }
+  public set avatarid(s:any) {
+    this._avatarid = ((s !== undefined) && (s !== null) &&
+    (s.trim().length > 0)) ? s : null;
+  }
+  public get has_avatarid(){
+    return (this.avatarid !== null);
+  }
   public get index_name():string{
     return this.collection_name + '/by_id';
   }
@@ -105,13 +132,6 @@ class BaseItem implements InfoData.IBaseItem {
   public get has_type(): boolean {
     return (this.type !== null);
   }
-  public get localmode():string {
-    return this._localmode;
-  }
-  public set localmode(s:string){
-    this._localmode =  ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) ?
-    s : null;
-  }
   public get attachments():any {
     return this._attachments;
   }
@@ -132,15 +152,12 @@ class BaseItem implements InfoData.IBaseItem {
   }
   public to_insert_map(oMap: any): void {
       oMap.type = this.type;
-      if (this.localmode !== null){
-        oMap.localmode = this.localmode;
-      }
+      oMap.avatarid = this.avatarid;
   }
   public to_fetch_map(oMap: any): void {
     this.to_insert_map(oMap);
     oMap._id = this.id;
     oMap._rev = this.rev;
-    oMap.localmode = null;
   }
   public toString(): string {
     var oMap = {};

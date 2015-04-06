@@ -122,19 +122,25 @@ class CouchDatabase extends ItemGenerator
     });
   }// isConnected
   //
-  public get_items_range(item:InfoData.IBaseItem,startKey?: string, endKey?: string,
+  public get_items_range(item: InfoData.IBaseItem, startKey?: any, endKey?: any,
     skip?: number, limit?: number,
-    descending?: boolean,bIncludeEnd?:boolean): Q.IPromise<InfoData.IBaseItem[]> {
+    descending?: boolean, bIncludeEnd?: boolean, bDoc?: boolean,bAttach?:boolean):
+    Q.IPromise<any[]> {
     return Q.Promise((resolve, reject) => {
       var indexName = item.index_name;
-      var options: PouchAllDocsOptions = {
-        include_docs: true, attachments: true
-      };
-      if ((bIncludeEnd !== undefined) && (bIncludeEnd !== null)){
+      var options: PouchAllDocsOptions = {};
+      var bGetData: boolean = false;
+      if ((startKey !== undefined) && (startKey !== null)) {
+        options.startkey = startKey;
+      }
+      if ((endKey != undefined) && (endKey !== null)) {
+        options.endkey = endKey;
+      }
+      if ((bIncludeEnd !== undefined) && (bIncludeEnd !== null)) {
         options.inclusive_end = bIncludeEnd;
       }
-      if ((startKey !== undefined) && (startKey !== null)){
-        options.startkey = startKey;
+      if ((skip !== undefined) && (skip !== null) && (skip > 0)) {
+        options.skip = skip;
       }
       if ((limit !== undefined) && (limit !== null) &&
         (limit > 0)) {
@@ -143,35 +149,43 @@ class CouchDatabase extends ItemGenerator
       if ((descending !== undefined) && (descending !== null)) {
         options.descending = descending;
       }
-      if ((endKey != undefined) && (endKey !== null)) {
-        options.endkey = endKey;
+      if ((bDoc !== undefined) && (bDoc !== null)) {
+        options.include_docs = bDoc;
+        bGetData = true;
       }
-      if ((skip !== undefined) && (skip !== null) && (skip > 0)) {
-        options.skip = skip;
+      if ((bAttach !== undefined) && (bAttach !== null)) {
+        options.attachments = bAttach;
       }
-      var oRet: InfoData.IBaseItem[] = [];
+      var oRet: any[] = [];
       this.open().then((db) => {
-        db.query(indexName,options).then((rr) => {
+      db.query(indexName, options).then((rr) => {
+      //  db.allDocs(options).then((rr) => {
+          var oMaps: any[] = [];
           if ((rr !== undefined) && (rr !== null)) {
-            var oMaps: any[] = [];
             var data = rr.rows;
             if ((data !== undefined) && (data !== null)) {
               var n = data.length;
               for (var i = 0; i < n; ++i) {
                 var r = data[i];
-                var val = r.value;
-                if ((val !== undefined) && (val !== null)) {
-                  if ((val.deleted === undefined) && (val.error === undefined)) {
-                    var oMap = this.create_item(r.doc);
-                    if (oMap !== null) {
-                      oMaps.push(oMap);
-                    }
+                if ((r.value !== undefined) && (r.value !== null)) {
+                  if (r.error || r.deleted) {
+                    continue;
                   }
+                }
+                if (!bGetData) {
+                  oRet.push(r);
+                } else {
+                  var oMap = r.doc;
+                  if ((oMap !== undefined) && (oMap !== null)) {
+                    oMaps.push(oMap);
+                  }// oMap
                 }
               }// i
             }// data
+            if (bGetData) {
+              oRet = this.convert_items(oMaps);
+            }
           }// rr
-          oRet = this.convert_items(oMaps);
           resolve(oRet);
         }, (e) => {
             reject(e);
@@ -182,12 +196,12 @@ class CouchDatabase extends ItemGenerator
     });
   }//get_items_range
   //
-  public get_items_count(item:InfoData.IBaseItem,startKey?: string, endKey?: string): Q.IPromise<number> {
+  public get_items_count(item: InfoData.IBaseItem, startKey?: string, endKey?: string): Q.IPromise<number> {
     return Q.Promise((resolve, reject) => {
       var indexName = item.index_name;
       var options: PouchAllDocsOptions = {
       };
-      if ((startKey !== null) && (startKey !== null)){
+      if ((startKey !== null) && (startKey !== null)) {
         options.startkey = startKey;
       }
       if ((endKey !== undefined) && (endKey !== null)) {
@@ -195,7 +209,7 @@ class CouchDatabase extends ItemGenerator
       }
       var oRet: number = 0;
       this.open().then((db) => {
-        db.query(indexName,options).then((rr) => {
+        db.query(indexName, options).then((rr) => {
           if ((rr !== undefined) && (rr !== null)) {
             var oMaps: any[] = [];
             var data = rr.rows;
@@ -215,33 +229,11 @@ class CouchDatabase extends ItemGenerator
   public find_person_by_username(username: string): Q.IPromise<InfoData.IBaseItem> {
     var suser = ((username !== undefined) && (username !== null)) ?
       username.trim().toLowerCase() : null;
-    return Q.Promise((resolve, reject) => {
-      if (suser === null) {
-        resolve(null);
+      if (suser === null){
+        return Q.resolve(null);
       } else {
-        this.open().then((db) => {
-          db.query("persons/by_username",
-            {
-              include_docs: true, key: suser,
-              attachments: true
-            }).then((r) => {
-              if ((r !== undefined) && (r !== null) &&
-                (r.rows !== undefined) && (r.rows !== null) &&
-                (r.rows.length > 0)) {
-                var v = r.rows[0];
-                var x = this.create_item(v.doc);
-                resolve(x);
-              } else {
-                resolve(null);
-              }
-            }, (e) => {
-              resolve(null);
-            });
-        }, (err) => {
-            reject(err);
-          });
+        return this.get_item_by_id('PER-' + suser);
       }
-    });
   }// find_person_by_username
   //
   public get_item_by_id(id: string): Q.IPromise<InfoData.IBaseItem> {
@@ -254,7 +246,11 @@ class CouchDatabase extends ItemGenerator
             var oResult = this.create_item(r);
             resolve(oResult);
           }, (e) => {
-              resolve(null);
+              if (e.status == 404){
+                resolve(null);
+              } else {
+                reject(e);
+              }
             });
         }, (err) => {
             reject(err);
@@ -327,20 +323,20 @@ class CouchDatabase extends ItemGenerator
         reason: 'CouchDatabase maintains_one_item error'
       });
     }
-    if (id === null){
+    if (id === null) {
       id = item.create_id();
       oMap['_id'] = id;
     }
-    return Q.Promise((resolve,reject)=>{
-      this._maintains_doc(oMap).then((r)=>{
-        this.get_item_by_id(id).then((rr)=>{
+    return Q.Promise((resolve, reject) => {
+      this._maintains_doc(oMap).then((r) => {
+        this.get_item_by_id(id).then((rr) => {
           resolve(rr);
-        },(ex)=>{
-          reject(ex);
+        }, (ex) => {
+            reject(ex);
+          });
+      }, (err) => {
+          reject(err);
         });
-      },(err)=>{
-        reject(err);
-      });
     });
   }//maintains_one_item
   //
@@ -482,5 +478,92 @@ class CouchDatabase extends ItemGenerator
       }
     });
   }// remove_one_item
+  //
+  public get_attachment(item:InfoData.IBaseItem, attachmentId:string) : Q.IPromise<Blob>{
+    var id = ((item !== undefined) && (item !== null)) ? item.id : null;
+    var sId = ((attachmentId !== undefined) && (attachmentId !== null)) ?
+    attachmentId : null;
+    if ((id === null)  || (sId === null)){
+      return Q.reject({
+        status: 7202,
+        error: 'Invalid input data ',
+        reason: 'CouchDatabase maintains_attachment error'
+      });
+    }
+   return Q.Promise((resolve,reject) =>{
+     this.open().then((db)=>{
+       db.getAttachment(id,sId).then((r)=>{
+         resolve(r);
+       },(ex)=>{
+         if (ex.status == 404){
+           resolve(null);
+         } else {
+           reject(ex);
+         }
+       });
+     },(err)=>{
+       reject(err);
+     });
+   });
+  }// get_attachment
+  //
+  public maintains_attachment(item:InfoData.IBaseItem,attachmentId:string,
+    attachment:Blob,type:string) : Q.IPromise<boolean>{
+     var id = ((item !== undefined) && (item !== null)) ? item.id : null;
+     var rev = ((item !== undefined) && (item !== null)) ? item.rev : null;
+     var sId = ((attachmentId !== undefined) && (attachmentId !== null)) ?
+     attachmentId : null;
+     var stype = ((type !== undefined) && (type !== null) && (type.trim().length > 0)) ?
+     type.trim(): null;
+     var bData = (attachment !== undefined) ? attachment : null;
+     if ((id === null) || (rev === null) || (sId === null) || (bData === null)
+     || (stype === null)){
+       return Q.reject({
+         status: 7002,
+         error: 'Invalid input data ',
+         reason: 'CouchDatabase maintains_attachment error'
+       });
+     }
+    return Q.Promise((resolve,reject) =>{
+      this.open().then((db)=>{
+        db.putAttachment(id,sId,rev,bData,stype).then((r)=>{
+          item.rev = r.rev;
+          resolve(true);
+        },(ex)=>{
+          reject(ex);
+        });
+      },(err)=>{
+        reject(err);
+      });
+    });
+  }// maintains_attachment
+  //
+  public remove_attachment(item:InfoData.IBaseItem, attachmentId:string) :
+   Q.IPromise<boolean>{
+     var id = ((item !== undefined) && (item !== null)) ? item.id : null;
+     var rev = ((item !== undefined) && (item !== null)) ? item.rev : null;
+     var sId = ((attachmentId !== undefined) && (attachmentId !== null)) ?
+     attachmentId : null;
+     if ((id === null) || (rev === null) || (sId === null)){
+       return Q.reject({
+         status: 7102,
+         error: 'Invalid input data ',
+         reason: 'CouchDatabase remove_attachment error'
+       });
+     }
+    return Q.Promise((resolve,reject) =>{
+      var bRet:boolean = false;
+      this.open().then((db)=>{
+        db.removeAttachment(id,sId,rev).then((r)=>{
+          item.rev = r.rev;
+          resolve(true);
+        },(ex)=>{
+          reject(ex);
+        });
+      },(err)=>{
+        reject(err);
+      });
+    });
+  }//  remove_attachment
 }// class LocalCouchDatabase
 export = CouchDatabase;

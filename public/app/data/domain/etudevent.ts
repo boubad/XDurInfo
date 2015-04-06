@@ -11,6 +11,7 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
   private _evt: any;
   private _note: number;
   private _etud: any;
+  private _fullname;
   //
   constructor(oMap?: any) {
     super(oMap);
@@ -30,6 +31,9 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
       }
       if (oMap.note !== undefined) {
         this.note = oMap.note;
+      }
+      if (oMap.fullname !== undefined){
+        this.fullname = oMap.fullname;
       }
     }// oMap
   }// constructor
@@ -104,13 +108,23 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
   public get has_note(): boolean {
     return (this.note !== null);
   }
+  public get fullname():string {
+    return this._fullname;
+  }
+  public set fullname(s:string){
+    this._fullname = ((s !== undefined) && (s !== null) && (s.trim().length > 0)) ?
+    s.trim() : null;
+  }
+  public get has_fullname():boolean {
+    return (this.fullname !== null);
+  }
   //
   public get is_storeable(): boolean {
     return (this.type !== null) && (this.collection_name !== null) &&
       this.has_departementid && this.has_anneeid && this.has_semestreid &&
       this.has_uniteid && this.has_matiereid && this.has_groupeid &&
       this.has_genre && this.has_date && this.has_etudaffectationid &&
-      this.has_groupeeventid && this.has_etudiantid;
+      this.has_groupeeventid && this.has_etudiantid && this.has_fullname;
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);
@@ -118,6 +132,7 @@ class EtudEvent extends BaseEvent implements InfoData.IEtudEvent {
       oMap.groupeeventid = this.groupeeventid;
       oMap.etudiantid = this.etudiantid;
       oMap.note = this.note;
+      oMap.fullname = this.fullname;
   }// to_insert_map
 }// class EtudEvent
 export = EtudEvent;

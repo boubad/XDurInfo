@@ -9,7 +9,14 @@ interface PouchError {
 	error: string;
 	reason: string;
 }
-
+interface IPouchAttachment {
+	content_type:string;
+	digest?:string;
+	stub?:boolean;
+	data?:any;
+	length?:number;
+	revpos?:number;
+}
 interface PouchApi {
 	type(): string;
 	id(): string;
@@ -187,9 +194,9 @@ interface PouchAttachmentOptions {
 }
 
 interface PouchApi {
-	getAttachment: (id:string,opts?: PouchAttachmentOptions) => Q.IPromise<any>;
-	putAttachment: (id:string,rev:string,doc:any,type:string) => Q.IPromise<PouchUpdateResponse>;
-	removeAttchment : (id:string, rev:string) => Q.IPromise<PouchUpdateResponse>;
+	getAttachment: (docId:string,attachmentId:string,opts?: PouchAttachmentOptions) => Q.IPromise<any>;
+	putAttachment: (docId:string,attachmentId:string,docRev:string,attachment:any,type:string) => Q.IPromise<PouchUpdateResponse>;
+	removeAttachment : (docId:string, attachmentId:string,docRev:string) => Q.IPromise<PouchUpdateResponse>;
 	/*
 	getAttachment(id: string, opts: PouchAttachmentOptions, callback: (err: PouchError, res: any) => void): void;
 	getAttachment(id: string, callback: (err: PouchError, res: any) => void): void;

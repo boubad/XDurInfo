@@ -5,31 +5,18 @@ import BaseItem = require('./baseitem');
 //
 class DescriptionItem extends BaseItem  implements InfoData.IDescriptionItem {
   private _desc: string;
-  private _avatarid: any;
+
   //
   constructor(oMap?: any) {
     super(oMap);
     this._desc = null;
-    this._avatarid = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.description !== undefined) {
         this.description = oMap.description;
       }
-      if (oMap.avatarid !== undefined) {
-        this.avatarid = oMap.avatarid;
-      }
+
     } // oMap
   } // constructor
-  public get avatarid(): any {
-    return this._avatarid;
-  } // id
-  public set avatarid(s: any) {
-    this._avatarid = ((s !== undefined) && (s !== null) && (s.toString().trim().length > 0)) ?
-    s : null;
-  } // id
-  public get has_avatarid(): boolean {
-    return (this.avatarid !== null);
-  }
   public get description(): string {
     return this._desc;
   } // description
@@ -42,8 +29,7 @@ class DescriptionItem extends BaseItem  implements InfoData.IDescriptionItem {
   }
   public to_insert_map(oMap: any) : void {
     super.to_insert_map(oMap);
-      oMap.description = this.description;
-      oMap.avatarid = this.avatarid;
+    oMap.description = this.description;
   } // toInsertMap
 }// class DescriptionItem
 export = DescriptionItem;

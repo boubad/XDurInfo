@@ -42,7 +42,8 @@ class MaintainsDatabase extends CouchDatabase {
                   (doc.type == 'adminperson')) {
                   if (doc.username !== undefined) {
                     var name = doc.lastname + ' ' + doc.firstname;
-                    emit(doc.username, name);
+                    var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                    emit(doc.username,[name,avatarid]);
                   }
                 }
               }
@@ -62,7 +63,8 @@ class MaintainsDatabase extends CouchDatabase {
                     if (doc.sigle !== undefined) {
                       var key = doc.sigle;
                       var val = (doc.name !== undefined) ? doc.name : key;
-                      emit(key, val);
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [val,avatarid]);
                     }
                   }
                 }.toString()
@@ -78,10 +80,11 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'unite')) {
-                    if (doc.sigle !== undefined) {
-                      var key = doc.id;
-                      var val = doc.sigle;
-                      emit(key, val);
+                    if ((doc.departementid !== undefined) && (doc.sigle !== undefined)) {
+                      var key = [doc.departementid,doc.sigle];
+                      var val = (doc.name) ? doc.name : doc.sigle;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [val,avatarid]);
                     }
                   }
                 }.toString()
@@ -97,10 +100,11 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'groupe')) {
-                    if (doc.sigle !== undefined) {
-                      var key = doc.id;
-                      var val = doc.sigle;
-                      emit(key, val);
+                    if ((doc.departementid !== undefined) && (doc.sigle !== undefined)) {
+                      var key = [doc.departementid,doc.sigle];
+                      var val = (doc.name) ? doc.name : doc.sigle;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [val,avatarid]);
                     }
                   }
                 }.toString()
@@ -116,10 +120,11 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'annee')) {
-                    if (doc.sigle !== undefined) {
-                      var key = doc.id;
-                      var val = doc.sigle;
-                      emit(key, val);
+                    if ((doc.departementid !== undefined) && (doc.sigle !== undefined)) {
+                      var key = [doc.departementid,doc.sigle];
+                      var val = (doc.name) ? doc.name : doc.sigle;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [val,avatarid]);
                     }
                   }
                 }.toString()
@@ -135,10 +140,11 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'semestre')) {
-                    if (doc.sigle !== undefined) {
-                      var key = doc.id;
-                      var val = doc.sigle;
-                      emit(key, val);
+                    if ((doc.anneeid !== undefined) && (doc.sigle !== undefined)) {
+                      var key = [doc.anneeid,doc.sigle];
+                      var val = (doc.name) ? doc.name : doc.sigle;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [val,avatarid]);
                     }
                   }
                 }.toString()
@@ -154,10 +160,11 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'matiere')) {
-                    if (doc.sigle !== undefined) {
-                      var key = doc.id;
-                      var val = doc.sigle;
-                      emit(key, val);
+                    if ((doc.departementid !== undefined) && (doc.uniteid !== undefined) && (doc.sigle !== undefined)) {
+                      var key = [doc.departementid, doc.uniteid, doc.sigle];
+                      var val = (doc.name) ? doc.name : doc.sigle;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [val,avatarid]);
                     }
                   }
                 }.toString()
@@ -173,10 +180,11 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'etudiant')) {
-                    if (doc.personid !== undefined) {
-                      var key = doc.id;
-                      var val = doc.personid;
-                      emit(key, val);
+                    if ((doc.departementid !== undefined) && (doc.personid !== undefined)) {
+                      var key = [doc.departementid, doc.personid];
+                      var name = (doc.fullname) ? doc.fullname : null;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [name,avatarid]);
                     }
                   }
                 }.toString()
@@ -191,11 +199,12 @@ class MaintainsDatabase extends CouchDatabase {
             views: {
               by_id: {
                 map: function(doc) {
-                  if ((doc.type !== undefined) && (doc.type == 'enseignant')) {
-                    if (doc.personid !== undefined) {
-                      var key = doc.id;
-                      var val = doc.personid;
-                      emit(key, val);
+                  if ((doc.type !== undefined) && (doc.type == 'etudiant')) {
+                    if ((doc.departementid !== undefined) && (doc.personid !== undefined)) {
+                      var key = [doc.departementid, doc.personid];
+                      var name = (doc.fullname) ? doc.fullname : null;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [name,avatarid]);
                     }
                   }
                 }.toString()
@@ -210,11 +219,12 @@ class MaintainsDatabase extends CouchDatabase {
             views: {
               by_id: {
                 map: function(doc) {
-                  if ((doc.type !== undefined) && (doc.type == 'operator')) {
-                    if (doc.personid !== undefined) {
-                      var key = doc.id;
-                      var val = doc.personid;
-                      emit(key, val);
+                  if ((doc.type !== undefined) && (doc.type == 'etudiant')) {
+                    if ((doc.departementid !== undefined) && (doc.personid !== undefined)) {
+                      var key = [doc.departementid, doc.personid];
+                      var name = (doc.fullname) ? doc.fullname : null;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [name,avatarid]);
                     }
                   }
                 }.toString()
@@ -229,11 +239,12 @@ class MaintainsDatabase extends CouchDatabase {
             views: {
               by_id: {
                 map: function(doc) {
-                  if ((doc.type !== undefined) && (doc.type == 'administrator')) {
-                    if (doc.personid !== undefined) {
-                      var key = doc.id;
-                      var val = doc.personid;
-                      emit(key, val);
+                  if ((doc.type !== undefined) && (doc.type == 'etudiant')) {
+                    if ((doc.departementid !== undefined) && (doc.personid !== undefined)) {
+                      var key = [doc.departementid, doc.personid];
+                      var name = (doc.fullname) ? doc.fullname : null;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit(key, [name,avatarid]);
                     }
                   }
                 }.toString()
@@ -249,10 +260,13 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'profaffectation')) {
-                    if (doc.personid !== undefined) {
-                      var key = doc.id;
-                      var val = doc.personid;
-                      emit(key, val);
+                    if ((doc.semestreid !== undefined) && (doc.matiereid !== undefined) &&
+                    (doc.enseignantid !== undefined) && (doc.personid !== undefined) &&
+                    (doc.groupeid !== undefined)) {
+                      var name = (doc.fullname) ? doc.fullname : null;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      var val = [doc.personid,doc.enseignantid,name,avatarid];
+                      emit([doc.semestreid,doc.matiereid,doc.groupeid],val);
                     }
                   }
                 }.toString()
@@ -268,10 +282,13 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'etudaffectation')) {
-                    if (doc.personid !== undefined) {
-                      var key = doc.id;
-                      var val = doc.personid;
-                      emit(key, val);
+                    if ((doc.semestreid !== undefined) && (doc.groupeid !== undefined) &&
+                    (doc.etudiantid !== undefined) && (doc.personid !== undefined)) {
+                      var name = (doc.fullname) ? doc.fullname : null;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      var val = [doc.personid,doc.etudiantid,name,avatarid];
+                      emit([1,doc.semestreid,doc.groupeid,name],val);
+                      emit([2,doc.personid,doc.etudiantid,name],val);
                     }
                   }
                 }.toString()
@@ -287,10 +304,15 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'groupeevent')) {
-                    if (doc.name !== undefined) {
-                      var key = doc.id;
-                      var val = doc.name;
-                      emit(key, val);
+                    if ((doc.semestreid !== undefined) && (doc.matiereid !== undefined)
+                     && (doc.profaffectationid !== undefined) && (doc.date !== undefined) &&
+                    (doc.name !== undefined) && (doc.enseignantid !== undefined)) {
+                      var name = doc.name;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      var val = [doc.date,doc.genre,doc.name,avatarid];
+                      emit([1,doc.semestreid,doc.profaffectationid],val);
+                      emit([2,doc.semestreid,doc.matiereid],val);
+                      emit([3,doc.semestreid,doc.enseignantid],val);
                     }
                   }
                 }.toString()
@@ -306,10 +328,15 @@ class MaintainsDatabase extends CouchDatabase {
               by_id: {
                 map: function(doc) {
                   if ((doc.type !== undefined) && (doc.type == 'etudevent')) {
-                    if (doc.personid !== undefined) {
-                      var key = doc.id;
-                      var val = doc.personid;
-                      emit(key, val);
+                    if ((doc.semestreid !== undefined) && (doc.etudiantid !== undefined) &&
+                    (doc.groupeeventid !== undefined) && (doc.personid !== undefined) &&
+                    (doc.genre !== undefined)) {
+                      var val = [doc.personid,name,avatarid];
+                      var name = (doc.fullname) ? doc.fullname : null;
+                      var avatarid = (doc.avatarid) ? doc.avatarid : null;
+                      emit([1,doc.groupeeventid,doc.genre],val);
+                      emit([2,doc.etudiantid,doc.genre],val);
+                      emit([3,doc.semestreid,doc.genre],val);
                     }
                   }
                 }.toString()

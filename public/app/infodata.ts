@@ -6,9 +6,9 @@ export interface IBaseItem {
   rev: any;
   attachments: any;
   type: string;
-  localmode: string;
   collection_name: string;
   index_name:string;
+  avatarid: string;
   //
   create_id: () => string;
   base_prefix:string;
@@ -21,6 +21,8 @@ export interface IBaseItem {
   to_fetch_map: (oMap: any) => void;
   sort_func: (p1: IBaseItem, p2: IBaseItem) => number;
   //
+  avatarurl?:any;
+  has_avatarurl?:boolean;
   sigle?: string;
   name?: string;
   description?: string;
@@ -37,8 +39,9 @@ export interface IBaseItem {
   coefficient?: number;
   ecs?: number;
   personid?: any;
-  avatarid?: any;
+  has_avatarid?:boolean;
   fullname?: string;
+  has_fullname?:boolean;
   date?: Date;
   location?: string;
   startTime?: Date;
@@ -76,10 +79,8 @@ export interface IBaseItem {
 }// interface IBaseItem
 export interface IDescriptionItem extends IBaseItem {
   description: string;
-  avatarid: any;
   //
   has_description: boolean;
-  has_avatarid: boolean;
 }// interface IDescriptionItem
 export interface IAttachedDoc extends IDescriptionItem {
   mimetype: string;
@@ -343,9 +344,9 @@ export interface IEtudEvent extends IBaseEvent {
 }// interface IEtudEvent
 //
 export interface IObjectStore {
-  get_value: (id: any) => Q.IPromise<IBaseItem>;
-  store_value: (item: IBaseItem) => Q.IPromise<any>;
-  remove_value: (id: any) => Q.IPromise<any>;
+  get_value: (id: any) => IBaseItem;
+  store_value: (key:any, item: IBaseItem) => boolean;
+  remove_value: (id: any) => boolean;
 }// interface IObjectStore
 //
 export interface IMenuDesc {
@@ -362,8 +363,13 @@ export interface IDatabaseManager {
   maintains_items: (items: IBaseItem[]) => Q.IPromise<IBaseItem[]>;
   remove_items: (items: IBaseItem[]) => Q.IPromise<boolean>
   remove_one_item: (item: IBaseItem) => Q.IPromise<boolean>;
-  get_items_range: (item:IBaseItem,startKey?: string, endKey?: string, skip?:number,limit?: number,
-  descending?: boolean,bIncludeEnd?:boolean) => Q.IPromise<IBaseItem[]>;
+  get_items_range: (item:IBaseItem,startKey?: any, endKey?: any, skip?:number,limit?: number,
+  descending?: boolean,bIncludeEnd?:boolean,bDoc?:boolean,bAttach?:boolean) => Q.IPromise<any[]>;
   get_items_count: (item:IBaseItem,startKey?: string, endKey?:string) => Q.IPromise<number>;
   find_person_by_username :(username:string) => Q.IPromise<IBaseItem>;
+  maintains_attachment: (item:IBaseItem, attachmentId:string, attachment:Blob,type:string) => Q.IPromise<boolean>;
+  get_attachment: (item:IBaseItem, attachmentId:string) => Q.IPromise<Blob>;
+  remove_attachment: (item:IBaseItem, attachmentId:string) => Q.IPromise<boolean>;
+  //
+
 }// interface IDatabaseManager
