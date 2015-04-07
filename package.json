@@ -18,6 +18,7 @@
     "grunt": "*",
     "typescript": "^1.4.1",
     "grunt-typescript":"*",
-    "grunt-contrib-watch":"*"
+    "grunt-contrib-watch":"*",
+    "grunt-execute":"*"  
   }
 }

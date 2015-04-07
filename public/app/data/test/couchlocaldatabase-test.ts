@@ -29,7 +29,7 @@ var dbMode = 'remote';
 
 //
 var main = () => {
-  /*
+  
   test('userinfo connect', (assert) => {
     var done = assert.async();
     var db = create_database();
@@ -51,8 +51,7 @@ var main = () => {
         done();
       });
   });
-  */
-/*
+  
   test('Get all matieres', (assert) => {
     var done = assert.async();
     var model = new Matiere();
@@ -71,8 +70,8 @@ var main = () => {
         done();
       });
   });
-  */
-  /*
+  
+    /*
   test(' insert admins', (assert) => {
    var done = assert.async();
    var dd: Person[] = [];
@@ -102,9 +101,9 @@ var main = () => {
        done();
      });
  });
-*/
+ */
   //
-/*
+
   test(' find_person_by_id',(assert)=>{
     var done = assert.async();
     var username = 'PER-admin';
@@ -169,7 +168,7 @@ var main = () => {
       done();
     });
   });
-*/
+
   test(' isConnected',(assert)=>{
     var done = assert.async();
     var db = create_database();
@@ -181,7 +180,7 @@ var main = () => {
       done();
     });
   });
-  /*
+  
   test('Get all departement', (assert) => {
     var done = assert.async();
     var model = new Departement();
@@ -226,7 +225,7 @@ var main = () => {
       ok(n >= 0, 'array length is ' + n);
       for (var i = 0; i < n; ++i) {
         var d = dd[i];
-        ok((d !== undefined) && (d !== null), 'item ' + i + ' is ' + d.toString());
+        ok((d !== undefined) && (d !== null), 'item ' + i + ' is ' + JSON.stringify(d));
       }// i
       done();
     }, (err) => {
@@ -234,7 +233,7 @@ var main = () => {
         done();
       });
   });
-*/
+
 /*
   test(' insert departements', (assert) => {
     var done = assert.async();
@@ -300,49 +299,6 @@ var main = () => {
         done();
       });
   });
-  */
-/*
-  test ('insert matieres',(assert)=>{
-    var done = assert.async();
-    var uniteid = 'UNT-DEP-DEP01-UN01';
-    var depid = "DEP-DEP01";
-    var mm = 10;
-    var bb = [];
-    for (var i = 0; i < mm; ++i){
-      var j = i + 1;
-      var sj = "" + j;
-      if (sj.length < 2) {
-        sj = '0' + sj;
-      }
-      bb.push(new Matiere({
-        departementid : depid,
-        uniteid: uniteid,
-        sigle: 'Mat' + sj,
-        name: 'Matière ' + sj,
-        description: 'Description matière ' + sj,
-        genre: 'Pratique',
-        mat_module: 'Md453',
-        coefficient : 5,
-        ecs: 400
-      }));
-    }// i
-    var db = create_database();
-    db.maintains_items(bb).then((dd) => {
-      ok((dd !== undefined) && (dd !== null) && (dd.length >= 0), "response is an array");
-      var n = dd.length;
-      ok(n >= 0, 'array length is ' + n);
-      for (var i = 0; i < n; ++i) {
-        var d = dd[i];
-        ok((d !== undefined) && (d !== null), 'item ' + i + ' is ' + d.toString());
-      }// i
-      done();
-    }, (err) => {
-        ok(false, JSON.stringify(err));
-        done();
-      });
-  });
-  */
-/*
   test('Fill departement children', (assert) => {
     var done = assert.async();
     var depid = 'DEP-DEP01';
@@ -374,6 +330,45 @@ var main = () => {
         sigle: 'ANNEE' + sj,
         name: 'Annee ' + sj,
         description: 'Description Année ' + sj
+      }));
+    }// i
+    var db = create_database();
+    db.maintains_items(bb).then((dd) => {
+      ok((dd !== undefined) && (dd !== null) && (dd.length >= 0), "response is an array");
+      var n = dd.length;
+      ok(n >= 0, 'array length is ' + n);
+      for (var i = 0; i < n; ++i) {
+        var d = dd[i];
+        ok((d !== undefined) && (d !== null), 'item ' + i + ' is ' + d.toString());
+      }// i
+      done();
+    }, (err) => {
+        ok(false, JSON.stringify(err));
+        done();
+      });
+  });
+  test ('insert matieres',(assert)=>{
+    var done = assert.async();
+    var uniteid = 'UNT-DEP-DEP01-UN01';
+    var depid = "DEP-DEP01";
+    var mm = 10;
+    var bb = [];
+    for (var i = 0; i < mm; ++i){
+      var j = i + 1;
+      var sj = "" + j;
+      if (sj.length < 2) {
+        sj = '0' + sj;
+      }
+      bb.push(new Matiere({
+        departementid : depid,
+        uniteid: uniteid,
+        sigle: 'Mat' + sj,
+        name: 'Matière ' + sj,
+        description: 'Description matière ' + sj,
+        genre: 'Pratique',
+        mat_module: 'Md453',
+        coefficient : 5,
+        ecs: 400
       }));
     }// i
     var db = create_database();
