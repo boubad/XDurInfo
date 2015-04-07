@@ -12,7 +12,8 @@ import Semestre = require('data/domain/semestre');
 //
 import UserInfo = require('data/model/userinfo');
 //
-var remoteUrl = 'http://localhost:5984/geninfo';
+//var remoteUrl = 'http://localhost:5984/geninfo';
+var remoteUrl = 'http://boubadiarra.hd.free.fr:5984/geninfo';
 //
 var dbMode = 'remote';
 //var dbMode = 'local';
@@ -28,6 +29,7 @@ var dbMode = 'remote';
 
 //
 var main = () => {
+  /*
   test('userinfo connect', (assert) => {
     var done = assert.async();
     var db = create_database();
@@ -49,6 +51,7 @@ var main = () => {
         done();
       });
   });
+  */
 /*
   test('Get all matieres', (assert) => {
     var done = assert.async();
@@ -166,7 +169,7 @@ var main = () => {
       done();
     });
   });
-
+*/
   test(' isConnected',(assert)=>{
     var done = assert.async();
     var db = create_database();
@@ -178,6 +181,7 @@ var main = () => {
       done();
     });
   });
+  /*
   test('Get all departement', (assert) => {
     var done = assert.async();
     var model = new Departement();

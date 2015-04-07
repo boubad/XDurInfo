@@ -1,4 +1,5 @@
 // userinfo.ts
+declare var window;
 //
 import InfoData = require('../../infodata');
 import Q = require('q');
