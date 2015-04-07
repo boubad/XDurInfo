@@ -10,10 +10,12 @@ import Annee = require('data/domain/annee');
 import Matiere = require('data/domain/matiere');
 import Semestre = require('data/domain/semestre');
 //
+import UserInfo = require('data/model/userinfo');
+//
 var remoteUrl = 'http://localhost:5984/geninfo';
 //
-//var dbMode = 'remote';
-var dbMode = 'local';
+var dbMode = 'remote';
+//var dbMode = 'local';
 //
  var create_database = () =>{
    if (dbMode == 'remote'){
@@ -26,7 +28,28 @@ var dbMode = 'local';
 
 //
 var main = () => {
- 
+  test('userinfo connect', (assert) => {
+    var done = assert.async();
+    var db = create_database();
+    var userinfo = new UserInfo(db);
+    var username = 'admin';
+    var password = 'admin';
+    userinfo.connect(username,password).then((pPers) => {
+      ok(pPers !== undefined, "response is defined");
+      if (pPers === null){
+        ok(true,'Connection failed!');
+      } else {
+        ok(true,'Connected: ' + pPers.toString());
+      }
+      var url = userinfo.avatarUrl;
+      ok(true,(url !== null) ? 'avatar url ' + url : 'NULL avatar url');
+      done();
+    }, (err) => {
+        ok(false, JSON.stringify(err));
+        done();
+      });
+  });
+/*
   test('Get all matieres', (assert) => {
     var done = assert.async();
     var model = new Matiere();
@@ -45,6 +68,7 @@ var main = () => {
         done();
       });
   });
+  */
   /*
   test(' insert admins', (assert) => {
    var done = assert.async();
@@ -77,7 +101,7 @@ var main = () => {
  });
 */
   //
-
+/*
   test(' find_person_by_id',(assert)=>{
     var done = assert.async();
     var username = 'PER-admin';
@@ -206,7 +230,7 @@ var main = () => {
         done();
       });
   });
-
+*/
 /*
   test(' insert departements', (assert) => {
     var done = assert.async();
