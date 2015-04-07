@@ -1,5 +1,4 @@
 {
-    "sbruchmann.staticpreview.basepath": "/home/boubad/projects/GitHub/XDurInfo/",
     "typescript": {
         "target": "ES5",
         "module": "AMD",
