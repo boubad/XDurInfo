@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="page-header">
+    <h1>
+      <span data-bind="text: title()"></span>
+    </h1>
+  </div>
+  <div data-bind="visible: hasError()" class="text-danger">
+    <strong>
+      <span data-bind="text: error()"></span>
+    </strong>
+  </div>
+  <div data-bind="visible: hasInfo()" class="text-success">
+    <strong>
+      <span data-bind="text: info()"></span>
+    </strong>
+  </div>
+  <div data-bind="visible: isConnected()">
+    <div class="row">
+      <div class="col-xs-9"/>
+      <div class="col-xs-1">
+        <strong>
+          <span data-bind="text: userFullName()"></span>
+        </strong>
+      </div>
+      <div class="col-xs-1" data-bind="visible: hasPhotoUrl()">
+        <img data-bind="attr: {src: userPhotoUrl()}" height='48' />
+      </div>
+      <div class ="col-xs-1">
+        <a data-bind="click: disconnect">Déconnecter</a>
+      </div>
+    </div>
+  </div>
+  <div data-bind="visible: isNotConnected()">
+    <div class="row">
+      <div class="col-xs-3">
+        <form role="form">
+          <div class="form-group">
+            <label for="username">Identifiant:</label>
+            <input type="text" class="form-control" id="username" data-bind="value: username" placeholder="Identifiant" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Mot de passe:</label>
+            <input type="password" class="form-control" id="password" data-bind="value: password" placeholder="Mot de passe" required />
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary" data-bind="visible: canConnect(), click: connect">Connexion</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

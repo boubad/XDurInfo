@@ -1,12 +1,15 @@
 // login.ts
 //
-import UserInfo = require('../data/model/userinfo');
 import CouchDatabase = require('../data/local/couchlocaldatabase');
 import LoginViewModel = require('../data/model/loginviewmodel');
 //
 class Login extends LoginViewModel {
   constructor(){
-    super(new UserInfo(new CouchDatabase()));
+    super(new CouchDatabase());
+  }
+  public activate(): any {
+    return true;
   }
 }// class Login
-export = Login;
+var pv = new Login();
+export = pv;

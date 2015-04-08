@@ -355,6 +355,15 @@ export interface IMenuDesc {
   desc?: string;
   img_source?: string;
 }
+export interface IElementDesc {
+  id:any;
+  text:string;
+  rev?:string;
+  avatarid?:any;
+  url?:string;
+  key?:any;
+  value?:any;
+}
 export interface IDatabaseManager {
   isConnected: () => Q.IPromise<boolean>;
   get_item_by_id: (id: string) => Q.IPromise<IBaseItem>;

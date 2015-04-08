@@ -2,15 +2,11 @@
 declare var window;
 //
 import InfoData = require('../../infodata');
-import Q = require('q');
 import UserSessionStore = require('./usersessionstore');
 //
-import CouchDatabase  = require('../local/couchlocaldatabase');
-//import Person = require('../domain/person');
 //
 class UserInfo extends UserSessionStore {
   //
-  public dataService:InfoData.IDatabaseManager;
   private _pers: InfoData.IPerson;
   public avatarUrl:string;
   public _departement:InfoData.IDepartement;
@@ -24,10 +20,8 @@ class UserInfo extends UserSessionStore {
   public _profaffectation:InfoData.IProfAffectation;
   public _groupeevent:InfoData.IGroupeEvent;
   //
-  constructor(server?:InfoData.IDatabaseManager) {
+  constructor() {
     super();
-    this.dataService = ((server !== undefined) && (server !== null)) ?
-    server : new CouchDatabase();
     this._pers = null;
     this.avatarUrl = null;
     this._departement = null;
@@ -183,45 +177,6 @@ class UserInfo extends UserSessionStore {
     this._pers = null;
     this.store_value('person', p);
     this._pers = this.get_value('person');
-  }
-  //
-
-  public connect(username:string,password:string):Q.IPromise<InfoData.IPerson> {
-    return Q.Promise((resolve,reject)=>{
-      var vRet:InfoData.IPerson = null;
-      this.person = null;
-      this.avatarUrl = null;
-      this.dataService.find_person_by_username(username).then((p:InfoData.IPerson)=>{
-        if ((p === undefined) || (p === null)){
-          resolve(vRet);
-        } else {
-          if (!p.check_password(password)){
-            resolve(vRet);
-          } else {
-            vRet = p;
-            this.person = p;
-            var avatar = p.avatarid;
-            if (avatar !== null){
-               this.dataService.get_attachment(p,avatar).then((data)=>{
-                 if ((data !== undefined) && (data !== null)){
-                    this.avatarUrl = window.URL.createObjectURL(data);
-                 }
-                 resolve(vRet);
-               },(ex)=>{
-                 resolve(vRet);
-               });
-            } else {
-              resolve(vRet);
-            }
-          }
-        }
-      },(err)=>{
-        reject(err);
-      });
-    });
-  }// connect
-  public disconnect(): void {
-    this.person = null;
     this.avatarUrl = null;
     this.departement = null;
     this.annee = null;
@@ -234,32 +189,8 @@ class UserInfo extends UserSessionStore {
     this.profaffectation = null;
     this.groupeevent = null;
   }
-  public get hasPhoto():boolean {
-    return (this.avatarUrl !== undefined) && (this.avatarUrl !== null);
-  }
-  public get isConnected():boolean {
-    return (this.person !== null) && (this.person.id !== null);
-  }
-  public get isProf():boolean {
-    return (this.person !== null) && this.person.is_prof;
-  }
-  public get isSuper():boolean{
-    return (this.person !== null) && this.person.is_super;
-  }
-  public get isOper():boolean {
-    if (this.person !== null){
-      return (this.person.is_admin || this.person.is_super || this.person.is_oper);
-    } else {
-      return false;
-    }
-  }
-  public get isAdmin():boolean {
-    if (this.person !== null){
-      return (this.person.is_admin || this.person.is_super);
-    } else {
-      return false;
-    }
-  }
 }// class UserInfo
 //
-export = UserInfo;
+var pv = new UserInfo();
+//
+export = pv;

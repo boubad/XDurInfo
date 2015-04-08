@@ -1,70 +1,76 @@
 //baseviewmodel.ts
 /// <reference path='../../../lib/typings/knockout/knockout.d.ts' />
 //
+declare var window;
+//
 import ko = require('knockout');
 import InfoData = require('../../infodata');
-import UserInfo = require('./userinfo');
+import userinfo = require('./userinfo');
+import CouchDatabase = require('../local/couchlocaldatabase');
 //
 class BaseViewModel {
   //
-  public userInfo:KnockoutObservable<UserInfo>;
+  public username:KnockoutObservable<string>;
+  public password:KnockoutObservable<string>;
   //
   public dataService: InfoData.IDatabaseManager;
   public title: KnockoutObservable<string>;
   public error: KnockoutObservable<string>;
   public info: KnockoutObservable<string>;
+  public isConnected: KnockoutObservable<boolean>;
   public menu: KnockoutObservableArray<InfoData.IMenuDesc>;
   //
-  public person:KnockoutComputed<InfoData.IPerson>;
-  public userFullName: KnockoutComputed<string>;
-  public userPhotoUrl: KnockoutComputed<string>;
-  public isConnected: KnockoutComputed<boolean>;
+  public person:KnockoutObservable<InfoData.IPerson>;
+  public userFullName: KnockoutObservable<string>;
+  public userPhotoUrl: KnockoutObservable<string>;
+
+  public isNotConnected: KnockoutComputed<boolean>;
   public isAdmin: KnockoutComputed<boolean>;
   public isProf: KnockoutComputed<boolean>;
   public isSuper: KnockoutComputed<boolean>;
   public isOper: KnockoutComputed<boolean>;
   public hasPhotoUrl: KnockoutComputed<boolean>;
+  public hasError: KnockoutComputed<boolean>;
+  public hasInfo: KnockoutComputed<boolean>;
   //
-  constructor(userinfo?: UserInfo, server?: InfoData.IDatabaseManager) {
+  public canConnect:KnockoutComputed<boolean>;
+  //
+  constructor(server?: InfoData.IDatabaseManager) {
+    this.dataService = ((server !== undefined) && (server !== null)) ? server :
+     new CouchDatabase();
     //
+    this.username = ko.observable(null);
+    this.password = ko.observable(null);
     this.title = ko.observable(null);
     this.error = ko.observable(null);
     this.info = ko.observable(null);
     this.menu = ko.observableArray([]);
+    this.isConnected = ko.observable(false);
+    this.person = ko.observable(null);
+    this.userFullName = ko.observable(null);
+    this.userPhotoUrl = ko.observable(null);
     //
-    this.userInfo = ko.observable(((userinfo !== undefined) && (userinfo !== null)) ?
-    userinfo : new UserInfo(server));
-    this.dataService = this.userInfo().dataService;
-    //
-    this.person = ko.computed({
-      read: ()=>{
-        var vRet:InfoData.IPerson = this.userInfo().person;
-        return vRet;
-      },
-      write: (s:InfoData.IPerson) => {
-        this.userInfo().person = s;
-      },
-      owner: this
-    });
-    this.userFullName = ko.computed(()=>{
-      var sRet:string = null;
-      var p = this.person();
-      sRet = (p !== null) ? p.fullname : null;
-      return sRet;
+    this.canConnect = ko.computed(()=>{
+      var s1 = (this.username() !== null) ? this.username().trim() : null;
+      var s2 = (this.password() !== null) ? this.password() : null;
+      return (s1 !== null) && (s1.length > 0) && (s2 !== null) && (s2.length > 0);
     },this);
-    this.userPhotoUrl = ko.computed(()=>{
-      var sRet:string = null;
-      var p = this.person();
-      sRet = (p !== null) ? p.avatarurl : null;
-      return sRet;
+    //
+    this.hasError = ko.computed(()=>{
+      var s = this.error();
+      return ((s !== null) && (s.length > 0));
+    },this);
+    this.hasInfo = ko.computed(()=>{
+      var s = this.info();
+      return ((s !== null) && (s.length > 0));
     },this);
     this.hasPhotoUrl = ko.computed(()=>{
       var p = this.userPhotoUrl();
       return (p !== null);
     },this);
-    this.isConnected = ko.computed(()=>{
-      var p = this.person();
-      return (p !== null) && (p.id !== null);
+    this.isNotConnected = ko.computed(()=>{
+      var p = this.isConnected();
+      return (!p);
     },this);
     this.isSuper = ko.computed(()=>{
         var p = this.person();
@@ -84,7 +90,54 @@ class BaseViewModel {
     },this);
   }// constructor
   //
-
+  public connect() : void {
+    var suser = this.username();
+    var spass = this.password();
+    this.clear_error();
+    this.person(null);
+    this.userFullName(null);
+    this.userPhotoUrl(null);
+    this.isConnected(false);
+    var service = this.dataService;
+    if (service === null){
+      service = new CouchDatabase();
+      this.dataService = service;
+    }
+    service.find_person_by_username(suser).then((p:InfoData.IPerson)=>{
+      if ((p !== undefined) && (p !== null)){
+         if (p.check_password(spass)){
+            this.username(null);
+            this.password(null);
+            this.person(p);
+            userinfo.person = p;
+            var s = p.fullname;
+            this.userFullName(s);
+            this.isConnected(true);
+            var id = p.avatarid;
+            if ((id !== undefined) && (id !== null)){
+               service.get_attachment(p,id).then((blob:Blob)=>{
+                 var xurl = window.URL.createObjectURL(blob);
+                 this.userPhotoUrl(xurl);
+               },(ex)=>{
+                 this.set_error(ex);
+               });
+            }// avatar
+         }// ok
+      }// p
+    },(err)=>{
+      this.set_error(err);
+    });
+  }// connect
+  //
+  public disconnect():void {
+    this.person(null);
+    this.userFullName(null);
+    this.userPhotoUrl(null);
+    this.username(null);
+    this.password(null);
+    this.isConnected(false);
+    userinfo.person = null;
+  }
   //
   public update_title(): void {
 
