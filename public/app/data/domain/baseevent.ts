@@ -14,7 +14,6 @@ class BaseEvent extends DepartementChild implements InfoData.IBaseEvent {
   private _uniteid: any;
   private _matiereid: any;
   private _genre: string;
-  private _docs: any[];
   private _status: string;
   //
   constructor(oMap?: any) {
@@ -27,7 +26,6 @@ class BaseEvent extends DepartementChild implements InfoData.IBaseEvent {
     this._uniteid = null;
     this._matiereid = null;
     this._genre = null;
-    this._docs = [];
     this._status = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.anneeid !== undefined) {
@@ -54,9 +52,6 @@ class BaseEvent extends DepartementChild implements InfoData.IBaseEvent {
       if (oMap.status !== undefined) {
         this.status = oMap.status;
       }
-      if (oMap.documentids !== undefined) {
-        this.documentids = oMap.documentids;
-      }
       if (oMap.date !== undefined) {
         this.date = oMap.date;
       }
@@ -66,39 +61,6 @@ class BaseEvent extends DepartementChild implements InfoData.IBaseEvent {
   //
   public get search_prefix(): string {
     return this.base_prefix + '-' + this.semestreid + '-' + this.groupeid;
-  }
-  //
-  public get documentids(): any[] {
-    return ((this._docs !== undefined) && (this._docs !== null)) ?
-     this._docs : [];
-  }
-  public set documentids(s: any[]) {
-    if ((s !== undefined) && (s !== null) && (s.length > 0)) {
-      this._docs = s;
-    } else {
-      this._docs = null;
-    }
-  }
-  public get has_documentids(): boolean {
-    return ((this.documentids !== null) && (this.documentids.length > 0));
-  }
-  public add_documentid(id: any): void {
-    if ((id !== undefined) && (id !== null) &&
-      (id.toString().trim().length > 0)) {
-      if ((this._docs === undefined) || (this._docs === null)) {
-        this._docs = [];
-      }
-      BaseItem.array_add(this._docs, id);
-    }
-  }
-  public remove_documentid(id: any): void {
-    if ((id !== undefined) && (id !== null) &&
-      (id.toString().trim().length > 0)) {
-      if ((this._docs !== undefined) && (this._docs !== null) &&
-        (this._docs.length > 0)) {
-        BaseItem.array_remove(this._docs, id);
-      }
-    }
   }
   //
   public get status(): string {
@@ -240,7 +202,6 @@ class BaseEvent extends DepartementChild implements InfoData.IBaseEvent {
       oMap.uniteid = this.uniteid;
       oMap.matiereid = this.matiereid;
       oMap.status = this.status;
-      oMap.documentids = this.documentids;
   }// to_insert_map
   public to_fetch_map(oMap: any) : void {
     super.to_fetch_map(oMap);

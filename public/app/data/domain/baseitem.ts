@@ -3,23 +3,18 @@
 //
 import InfoData = require('../../infodata');
 //
-import moment = require('moment');
-//
-var AVATAR_NAME = 'avatar';
 //
 class BaseItem implements InfoData.IBaseItem {
   private _id: any;
   private _rev: any;
   private _attachments:any;
   private _avatarid:any;
-  private _url:any;
   //
   constructor(oMap?: any) {
     this._id = null;
     this._rev = null;
     this._attachments = null;
     this._avatarid = null;
-    this._url = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap._id !== undefined) {
         this.id = oMap._id;
@@ -35,15 +30,6 @@ class BaseItem implements InfoData.IBaseItem {
       }
     }
   }// constructor
-  public get avatarurl():any {
-    return this._url;
-  }
-  public set avatarurl(s:any){
-    this._url = s;
-  }
-  public get has_avatarurl():boolean {
-    return (this.avatarurl !== null);
-  }
   public get avatarid():any {
     if ((this._avatarid !== undefined) && (this._avatarid !== null) &&
     (this._avatarid.toString().trim().length > 0)){
@@ -63,8 +49,12 @@ class BaseItem implements InfoData.IBaseItem {
   }
   public create_id():  string{
     var n:number = Math.floor(Math.random() * 10000.0);
-    var s:string = (new Date()).toISOString() + '-' + n;
-    var ss = this.search_prefix + '-' + s;
+    var sn = '' + n;
+    while(sn.length < 4){
+      sn = '0' + sn;n
+    }
+    var s:string = ((new Date()).toISOString()).substr(0,10) + '-' + sn;
+    var ss = this.base_prefix + '-' + s;
     return ss;
   }// create_id
   public get base_prefix(): string {
@@ -73,39 +63,16 @@ class BaseItem implements InfoData.IBaseItem {
   public get search_prefix(): string {
     return this.base_prefix;
   }
-  public static get date_format(): string {
-    return 'YYYY-MM-DD';
-  }
   public static check_date(d: Date): Date {
     var dRet: Date = null;
     if ((d !== undefined) && (d !== null)) {
-      var x = moment(d);
-      if (x.isValid()) {
-        dRet = x.toDate();
-      }
+       var t = Date.parse(d.toString());
+       if (!isNaN(t)){
+         dRet = d;
+       }
     }
     return dRet;
   }// check_date
-  public static string_to_date(s: string): Date {
-    var dRet: Date = null;
-    if ((s !== undefined) && (s !== null) && (s.trim().length > 0)) {
-      var x = moment(s, BaseItem.date_format);
-      if (x.isValid()) {
-        dRet = x.toDate();
-      }
-    }
-    return dRet;
-  }// string_to_date
-  public static date_to_string(d: Date): string {
-    var sRet: string = null;
-    if ((d !== undefined) && (d !== null)) {
-      var x = moment(d);
-      if (x.isValid()) {
-        sRet = x.format(BaseItem.date_format);
-      }
-    }
-    return sRet;
-  }// date_to_string
   public get id(): any {
     return this._id;
   }
@@ -158,6 +125,7 @@ class BaseItem implements InfoData.IBaseItem {
     this.to_insert_map(oMap);
     oMap._id = this.id;
     oMap._rev = this.rev;
+    oMap._attachments = this.attachments;
   }
   public toString(): string {
     var oMap = {};

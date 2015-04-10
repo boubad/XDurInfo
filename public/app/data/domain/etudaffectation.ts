@@ -19,8 +19,10 @@ class EtudAffectation extends Affectation implements InfoData.IEtudAffectation {
     return 'ETF';
   }
   public create_id():  string{
-    return this.search_prefix + '-' + this.groupeid +
-    '-' + this.etudiantid + '-' + (new Date()).toISOString();
+    var d:Date = (this.has_startDate) ? this.startDate : new Date();
+    var s = (d.toISOString()).substr(0,10);
+    return this.semestreid + '-'  +
+    '-' + this.etudiantid + '-' + this.groupeid + '-' + s;
   }// create_id
   //
   public get etudiantid(): any {
@@ -38,6 +40,15 @@ class EtudAffectation extends Affectation implements InfoData.IEtudAffectation {
   }
   //
   public get is_storeable(): boolean {
+    var bRet:boolean = (this.type !== null) && (this.collection_name !== null) &&
+      (this.departementid !== null) && (this.anneeid !== null) &&
+       (this.semestreid !== null) &&
+      (this.groupeid !== null) && (this.personid !== null) && (this.etudiantid !== null) &&
+      (this.firstname !== null) &&
+      (this.lastname !== null);
+      if (!bRet){
+        return false;
+      }
     if (this.has_startDate && this.has_endDate) {
       if (this.startDate.getTime() > this.endDate.getTime()) {
         return false;
@@ -45,9 +56,7 @@ class EtudAffectation extends Affectation implements InfoData.IEtudAffectation {
     } else if (this.has_startDate || this.has_endDate) {
       return false;
     }
-    return (this.type != null) && (this.collection_name != null) &&
-      this.has_departementid && this.has_anneeid && this.has_semestreid &&
-      this.has_personid && this.has_groupeid && this.has_etudiantid;
+    return true;
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);

@@ -6,6 +6,7 @@ import Q = require('q');
 import PouchDB = require('pouchdb');
 import InfoData = require('../../infodata');
 import ItemGenerator = require('../itemgenerator');
+import ElementDesc = require('../../elementdesc');
 //
 //var x = PouchDBFind;
 //PouchDB.plugin(x);
@@ -74,24 +75,24 @@ class CouchDatabase extends ItemGenerator
   }// open
   public _maintains_doc(ddoc: any): Q.IPromise<PouchUpdateResponse> {
     return Q.Promise((resolve, reject) => {
-      this.open().then((db) => {
+      this.open().then((db:PouchDB) => {
         var id = ddoc._id;
-        db.get(id).then((r) => {
+        db.get(id).then((r:PouchGetResponse) => {
           ddoc._rev = r._rev;
-          db.put(ddoc).then((rx) => {
+          db.put(ddoc).then((rx:PouchUpdateResponse) => {
             resolve(rx);
-          }, (ex) => {
+          }, (ex:PouchError) => {
               if (ex.status == 409) {
                 resolve({ id: id, ok: false, rev: null });
               } else {
                 reject(ex);
               }
             });
-        }, (e1) => {
+        }, (e1:PouchError) => {
             if (e1.status == 404) {
               db.put(ddoc).then((rx) => {
                 resolve(rx);
-              }, (ex) => {
+              }, (ex:PouchError) => {
                   if (ex.status == 409) {
                     resolve({ id: id, ok: false, rev: null });
                   } else {
@@ -102,7 +103,7 @@ class CouchDatabase extends ItemGenerator
               reject(e1);
             }
           });
-      }, (err) => {
+      }, (err:PouchError) => {
           reject(err);
         });
     });
@@ -113,21 +114,20 @@ class CouchDatabase extends ItemGenerator
       this.open().then((db) => {
         db.info().then((xinfo) => {
           resolve(true);
-        }, (e) => {
+        }, (e:PouchError) => {
             reject(e);
           });
-      }, (err) => {
+      }, (err:PouchError) => {
           reject(err);
         });
     });
   }// isConnected
   //
-  public get_items_range(item: InfoData.IBaseItem, startKey?: any, endKey?: any,
+  public find_elements_range(indexName:string, startKey?: any, endKey?: any,
     skip?: number, limit?: number,
     descending?: boolean, bIncludeEnd?: boolean, bDoc?: boolean,bAttach?:boolean):
     Q.IPromise<any[]> {
     return Q.Promise((resolve, reject) => {
-      var indexName = item.index_name;
       var options: PouchAllDocsOptions = {};
       var bGetData: boolean = false;
       if ((startKey !== undefined) && (startKey !== null)) {
@@ -156,11 +156,10 @@ class CouchDatabase extends ItemGenerator
       if ((bAttach !== undefined) && (bAttach !== null)) {
         options.attachments = bAttach;
       }
-      var oRet: any[] = [];
+
       this.open().then((db) => {
       db.query(indexName, options).then((rr) => {
-      //  db.allDocs(options).then((rr) => {
-          var oMaps: any[] = [];
+          var oRet: any[] = [];
           if ((rr !== undefined) && (rr !== null)) {
             var data = rr.rows;
             if ((data !== undefined) && (data !== null)) {
@@ -168,23 +167,14 @@ class CouchDatabase extends ItemGenerator
               for (var i = 0; i < n; ++i) {
                 var r = data[i];
                 if ((r.value !== undefined) && (r.value !== null)) {
-                  if (r.error || r.deleted) {
+                  if ((r.error !== undefined) || (r.deleted !== undefined)) {
                     continue;
                   }
-                }
-                if (!bGetData) {
-                  oRet.push(r);
-                } else {
-                  var oMap = r.doc;
-                  if ((oMap !== undefined) && (oMap !== null)) {
-                    oMaps.push(oMap);
-                  }// oMap
+                  var xx = new ElementDesc(r.value);
+                  oRet.push(xx);
                 }
               }// i
             }// data
-            if (bGetData) {
-              oRet = this.convert_items(oMaps);
-            }
           }// rr
           resolve(oRet);
         }, (e) => {
@@ -196,36 +186,6 @@ class CouchDatabase extends ItemGenerator
     });
   }//get_items_range
   //
-  public get_items_count(item: InfoData.IBaseItem, startKey?: string, endKey?: string): Q.IPromise<number> {
-    return Q.Promise((resolve, reject) => {
-      var indexName = item.index_name;
-      var options: PouchAllDocsOptions = {
-      };
-      if ((startKey !== null) && (startKey !== null)) {
-        options.startkey = startKey;
-      }
-      if ((endKey !== undefined) && (endKey !== null)) {
-        options.endkey = endKey;
-      }
-      var oRet: number = 0;
-      this.open().then((db) => {
-        db.query(indexName, options).then((rr) => {
-          if ((rr !== undefined) && (rr !== null)) {
-            var oMaps: any[] = [];
-            var data = rr.rows;
-            if ((data !== undefined) && (data !== null)) {
-              oRet = data.length;
-            }// data
-          }// rr
-          resolve(oRet);
-        }, (e) => {
-            reject(e);
-          });
-      }, (err) => {
-          reject(err);
-        });
-    });
-  }//get_items_count
   public find_person_by_username(username: string): Q.IPromise<InfoData.IBaseItem> {
     var suser = ((username !== undefined) && (username !== null)) ?
       username.trim().toLowerCase() : null;
@@ -478,6 +438,27 @@ class CouchDatabase extends ItemGenerator
       }
     });
   }// remove_one_item
+  //
+  public get_docid_attachment(docid:string, attachmentid:string): Q.IPromise<Blob>{
+    if ((docid === null)  || (attachmentid === null)){
+      return Q.resolve(null);
+    }
+   return Q.Promise((resolve,reject) =>{
+     this.open().then((db)=>{
+       db.getAttachment(docid,attachmentid).then((r:Blob)=>{
+         resolve(r);
+       },(ex:PouchError)=>{
+         if (ex.status == 404){
+           resolve(null);
+         } else {
+           reject(ex);
+         }
+       });
+     },(err:PouchError)=>{
+       reject(err);
+     });
+   });
+  }// get_docid_attachment
   //
   public get_attachment(item:InfoData.IBaseItem, attachmentId:string) : Q.IPromise<Blob>{
     var id = ((item !== undefined) && (item !== null)) ? item.id : null;

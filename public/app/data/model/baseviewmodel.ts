@@ -1,8 +1,11 @@
 //baseviewmodel.ts
 /// <reference path='../../../lib/typings/knockout/knockout.d.ts' />
+/// <reference path='../../../lib/typings/pouchdb/pouchdb.d.ts'/>
+/// <reference path='../../../lib/typings/q/Q.d.ts'/>
 //
-declare var window;
+declare var window:any;
 //
+import Q = require('q');
 import ko = require('knockout');
 import InfoData = require('../../infodata');
 import userinfo = require('./userinfo');
@@ -90,6 +93,25 @@ class BaseViewModel {
     },this);
   }// constructor
   //
+  public confirm(message:string) : boolean {
+    return window.confirm(message);
+  }
+  //
+  public get_avatar_url(docId:any,avatarId:string) : Q.IPromise<string> {
+    return Q.Promise((resolve,reject)=>{
+      this.dataService.get_docid_attachment(docId,avatarId).then((blob)=>{
+        if ((blob === undefined) || (blob === null)){
+          resolve(null);
+        } else {
+          var xurl = window.URL.createObjectURL(blob);
+          resolve(xurl);
+        }
+      },(err:PouchError)=>{
+        resolve(null);
+      });
+    });
+  }//get_avatar_url
+  //
   public connect() : void {
     var suser = this.username();
     var spass = this.password();
@@ -115,16 +137,13 @@ class BaseViewModel {
             this.isConnected(true);
             var id = p.avatarid;
             if ((id !== undefined) && (id !== null)){
-               service.get_attachment(p,id).then((blob:Blob)=>{
-                 var xurl = window.URL.createObjectURL(blob);
+               this.get_avatar_url(p.id,id).then((xurl:string)=>{
                  this.userPhotoUrl(xurl);
-               },(ex)=>{
-                 this.set_error(ex);
                });
             }// avatar
          }// ok
       }// p
-    },(err)=>{
+    },(err:PouchError)=>{
       this.set_error(err);
     });
   }// connect

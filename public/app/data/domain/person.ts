@@ -21,7 +21,6 @@ class Person extends DescriptionItem implements InfoData.IPerson {
   private _matieres: any[];
   private _unites: any[];
   private _groupes: any[];
-  private _infos: any[];
   //
   constructor(oMap?: any) {
     super(oMap);
@@ -38,7 +37,6 @@ class Person extends DescriptionItem implements InfoData.IPerson {
     this._matieres = [];
     this._unites = [];
     this._groupes = [];
-    this._infos = [];
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.username !== undefined) {
         this.username = oMap.username;
@@ -61,9 +59,6 @@ class Person extends DescriptionItem implements InfoData.IPerson {
       if (oMap.departementids !== undefined) {
         this.departementids = oMap.departementids;
       } //
-      if (oMap.infoids !== undefined) {
-        this.infoids = oMap.infoids;
-      }
       if (oMap.roles !== undefined) {
         this.roles = oMap.roles;
       } //
@@ -89,7 +84,7 @@ class Person extends DescriptionItem implements InfoData.IPerson {
     return 'PER';
   }
   public get index_name():string {
-    return 'persons/by_username';
+    return 'persons/by_names';
   }
   public create_id():  string{
     return this.base_prefix + '-' + this.username;
@@ -275,35 +270,7 @@ class Person extends DescriptionItem implements InfoData.IPerson {
     }
   }
   //
-  public get infoids(): any[] {
-    return this._infos;
-  }
-  public set infoids(s: any[]) {
-    this._infos = ((s !== undefined) && (s !== null) && (s.length !== undefined) &&
-    (s.length > 0)) ? s : [];
-  }
-  public get has_infoids(): boolean {
-    return ((this._infos !== undefined) && (this._infos !== null) &&
-      (this._infos.length > 0));
-  }
-  public add_infoid(id: any): void {
-    if ((id !== undefined) && (id !== null) &&
-      (id.toString().trim().length > 0)) {
-      if ((this._infos === undefined) || (this._infos === null)) {
-        this._infos = [];
-      }
-      BaseItem.array_add(this._infos, id);
-    }
-  }
-  public remove_infoid(id: any): void {
-    if ((id !== undefined) && (id !== null) &&
-      (id.toString().trim().length > 0)) {
-      if ((this._infos !== undefined) && (this._infos !== null) &&
-        (this._infos.length > 0)) {
-        BaseItem.array_remove(this._infos, id);
-      }
-    }
-  }
+
   //
   public get roles(): string[] {
     return this._roles;
@@ -421,7 +388,6 @@ class Person extends DescriptionItem implements InfoData.IPerson {
       } else {
         this._first = ss.toUpperCase();
       }
-      this._last = s.trim().toUpperCase();
     } else {
       this._first = null;
     }
@@ -500,21 +466,8 @@ class Person extends DescriptionItem implements InfoData.IPerson {
       oMap.matiereids = this.matiereids;
       oMap.anneeids = this.anneeids;
       oMap.semestreids = this.semestreids;
-      oMap.infoids = this.infoids;
       oMap.groupeids = this.groupeids;
   } // to_insert_map
-  public to_fetch_map(oMap: any): void {
-      oMap._id = this.id;
-      oMap._rev = this.rev;
-      oMap.description = this.description;
-      oMap.avatarid = this.avatarid;
-      oMap.username = this.username;
-      oMap.password = this.password;
-      oMap.firstname = this.firstname;
-      oMap.lastname = this.lastname;
-      oMap.email = this.email;
-      oMap.phone = this.phone;
-  }
   public get is_storeable(): boolean {
     return (this.has_username && this.has_lastname && this.has_firstname);
   }

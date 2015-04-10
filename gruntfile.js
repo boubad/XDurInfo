@@ -32,11 +32,11 @@ module.exports = function (grunt) {
         open: {
             test: {
                 path: 'http://localhost:3000/test.html',
-                app: 'chrome'
+                app: 'google-chrome-stable'
             },
             dev: {
                 path: 'http://localhost:3000/index.html',
-                app: 'chrome'
+                app: 'google-chrome-stable'
             }
         },
         execute: {
@@ -48,5 +48,5 @@ module.exports = function (grunt) {
 
     });
     grunt.registerTask('default', ['connect', 'open:dev', 'watch']);
-    grunt.registerTask('test', ['connect', 'open:test', 'watch']);
+    grunt.registerTask('test', ['typescript','connect', 'open:test']);
 }

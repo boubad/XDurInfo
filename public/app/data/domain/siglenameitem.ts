@@ -21,7 +21,7 @@ class SigleNameItem extends DescriptionItem implements InfoData.ISigleNameItem{
     } // oMap
   } // constructor
   public create_id():  string{
-    return this.search_prefix + '-' + this.sigle.toUpperCase();
+    return this.base_prefix + '-' + this.sigle.toUpperCase();
   }// create_id
   public get sigle(): string {
     return this._sigle;

@@ -51,14 +51,11 @@ class GroupeEvent extends BaseEvent implements InfoData.IGroupeEvent {
   public get base_prefix():string {
     return 'GVT';
   }
-  public get search_prefix(): string {
-    return this.base_prefix + '-' + this.semestreid + '-' + this.matiereid +
-    '-' + this.groupeid;
-  }
   public create_id():  string{
-    return this.search_prefix +  this.date.toISOString() + '-' +
-     this.profaffectationid + '-' + this.genre + '-' +
-    (new Date()).toISOString();
+    var n = Math.floor(10000.0*Math.random());
+    var s:string = (this.date.toISOString()).substr(0,10);
+    return this.base_prefix + '-' + this.profaffectationid + '-' +
+     this.genre + '-' + s + '-' + n;
   }// create_id
   public get type(): string {
     return 'groupeevent';

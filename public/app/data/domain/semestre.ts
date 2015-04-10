@@ -20,6 +20,10 @@ class Semestre extends IntervalItem implements InfoData.ISemestre {
   public get search_prefix() : string{
     return 'SEM-' + this.anneeid;
   }// create_id
+  public create_id():  string{
+    var s = (this.startDate.toISOString()).substr(0,10);
+    return this.base_prefix + '-' + this.anneeid + s + '-' + this.sigle.toUpperCase();
+  }// create_id
   public get anneeid(): any {
     return this._anneeid;
   }

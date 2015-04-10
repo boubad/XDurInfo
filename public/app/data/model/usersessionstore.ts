@@ -19,7 +19,7 @@ class UserSessionStore extends ItemGenerator implements InfoData.IObjectStore {
   public store_value(key:any, item:InfoData.IBaseItem): boolean {
     if ((key !== undefined) && (key !== null) && (item !== undefined) && (item !== null)) {
         var oMap = {};
-        item.to_insert_map(oMap);
+        item.to_fetch_map(oMap);
         var sdata = JSON.stringify(oMap);
         window.sessionStorage.setItem(key, sdata);
         return true;

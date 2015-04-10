@@ -1,6 +1,7 @@
 // pagedviewmodel.ts
 /// <reference path='../../../lib/typings/knockout/knockout.d.ts' />
 /// <reference path='../../../lib/typings/q/Q.d.ts' />
+/// <reference path='../../../lib/typings/pouchdb/pouchdb.d.ts'/>
 //
 import Q = require('q');
 import ko = require('knockout');
@@ -8,11 +9,15 @@ import InfoData = require('../../infodata');
 import BaseViewModel = require('./baseviewmodel');
 import userinfo = require('./userinfo');
 //
-declare var window;
-//
 class PagedViewModel extends BaseViewModel {
   //
+  private _oldElement:InfoData.IElementDesc;
   public items:KnockoutObservableArray<InfoData.IElementDesc>;
+  public _current_element:KnockoutObservable<InfoData.IElementDesc>;
+  public current:KnockoutComputed<InfoData.IElementDesc>;
+  public _current_data:KnockoutObservable<InfoData.IBaseItem>;
+  public current_person:KnockoutObservable<InfoData.IPerson>;
+  public current_url:KnockoutObservable<string>;
   public start_key:any;
   public next_key:any;
   public prev_key:any;
@@ -20,12 +25,25 @@ class PagedViewModel extends BaseViewModel {
   public modelItem:InfoData.IBaseItem;
   public canPrevPage:KnockoutObservable<boolean>;
   public canNextPage:KnockoutObservable<boolean>;
+  public add_mode:KnockoutObservable<boolean>;
   public skip:number;
+  //
+  public description:KnockoutComputed<string>;
+  public canSave:KnockoutComputed<boolean>;
+  public canRemove:KnockoutComputed<boolean>;
+  public canAdd:KnockoutComputed<boolean>;
+  public canCancel:KnockoutComputed<boolean>;
   //
   constructor(model:InfoData.IBaseItem, server?: InfoData.IDatabaseManager) {
     super(server);
     this.modelItem = model;
+    this._oldElement = null;
     this.items = ko.observableArray([]);
+    this._current_element = ko.observable(null);
+    this._current_data = ko.observable(null);
+    this.current_person = ko.observable(null);
+    this.current_url = ko.observable(null);
+    this.add_mode = ko.observable(false);
     this.start_key = null;
     this.next_key = null;
     this.prev_key = null;
@@ -33,60 +51,149 @@ class PagedViewModel extends BaseViewModel {
     this.itemsPerPage = ko.observable(16);
     this.canPrevPage = ko.observable(false);
     this.canNextPage = ko.observable(false);
+    //
+    this.current = ko.computed({
+      read: ()=>{
+        var x = this._current_element();
+        return x;
+      },
+      write : (s:InfoData.IElementDesc) =>{
+          this.add_mode(false);
+          this._current_element(s);
+          this.change_current(s);
+      },
+      owner: this
+    });
+    this.canSave = ko.computed(()=>{
+      var x = this._current_data();
+      return (x !== null) && x.is_storeable;
+    },this);
+    this.canRemove = ko.computed(()=>{
+      var x = this._current_data();
+      return (x !== null) && (x.id !== null) && (x.rev !== null);
+    },this);
+    this.canAdd = ko.computed(()=>{
+      var x = this.add_mode();
+      return (!x);
+    },this);
+    this.canCancel = ko.computed(()=>{
+      var x = this.add_mode();
+      return x;
+    },this);
+    this.description = ko.computed({
+      read: ()=>{
+        var x = this._current_data();
+        return (x !== null) ? x.description : null;
+      },
+      write: (s: string) => {
+        var x = this._current_data();
+        if (x !== null){
+          this._current_data(null);
+          x.description = s;
+          this._current_data(x);
+        }
+      },
+      owner : this
+    });
   }// constructor
+  public create_item(): InfoData.IBaseItem {
+    return this.dataService.create_item({type: this.modelItem.type});
+  }// create_item
+  public addNew(): any {
+    this._oldElement = this.current();
+    this.current(null);
+    var x = this.create_item();
+    this._current_data(x);
+    this.add_mode(true);
+  }// addNew
+  public cancel() : any {
+    this.add_mode(false);
+    this.current(this._oldElement);
+  }
+  public save() : any {
+    var item = this._current_data();
+    if ((item == undefined) || (item === null)){
+      return;
+    }
+    if (!item.is_storeable){
+      return;
+    }
+    var bOld = (item.rev !== null);
+    this.clear_error();
+    this.dataService.maintains_one_item(item).then((p)=>{
+      if (!bOld){
+        this.refreshAll();
+      } else {
+        this.refresh();
+      }
+    },(err)=>{
+      this.set_error(err);
+    });
+  }// save
+  public remove(){
+    var item = this._current_data();
+    if ((item == undefined) || (item === null)){
+      return;
+    }
+    if ((item.id === null) || (item.rev === null)){
+      return;
+    }
+    var message = 'Voulez-vous vraiment supprimer cet element: ' + item.id + ' ?';
+    if (!this.confirm(message)){
+      return;
+    }
+    this.clear_error();
+    this.dataService.remove_one_item(item).then((p)=>{
+        this.refreshAll();
+    },(err)=>{
+      this.set_error(err);
+    });
+  }// remove
+  public change_current(s:InfoData.IElementDesc) : any {
+    var id = (s !== null) ? s.id : null;
+    if (s === null){
+      this.current_url(null);
+      this._current_data(null);
+      this.current_person(null);
+      this.update_menu();
+      return Q.resolve(null);
+    }
+    this.current_url(s.url);
+    var pRet = null;
+    return this.dataService.get_item_by_id(id).then((p)=>{
+      this._current_data(p);
+      pRet = p;
+      if (s.personid === null){
+        return null;
+      } else {
+        return this.dataService.get_item_by_id(s.personid);
+      }
+    }).then((pPers:InfoData.IPerson)=>{
+      this.current_person(pPers);
+      return pRet;
+    });
+  }// change_current
   public create_start_key():any{
     return [];
   }
-  public create_elem_item(src:any) : InfoData.IElementDesc {
-    var xRet:InfoData.IElementDesc = {
-      id : (src.id !== undefined) ? src.id : null,
-      text: (src.text !== undefined) ? src.text : null,
-      rev: (src.rev !== undefined) ? src.rev : null,
-      key: (src.key !== undefined) ? src.key : null,
-      value: (src.text !== undefined) ? src.value : null,
-      avatarid: (src.avatarid !== undefined) ? src.avatarid : null,
-      url:null
-    };
-    return xRet;
-  }
-  public convert_elems(rr:any[]) : InfoData.IElementDesc[] {
-    var oRet:InfoData.IElementDesc[] = [];
-    if ((rr !== undefined) && (rr !== null) && (rr.length > 0)){
-      var n = rr.length;
-      for (var i = 0; i < n; ++i){
-        var src = rr[i];
-        if ((src !== undefined) && (src !== null)){
-          oRet.push(this.create_elem_item(src));
-        }
-      }// i
-    }
-    return oRet;
-  }
-  public retrieve_one_avatar(elem:InfoData.IElementDesc) : Q.IPromise<InfoData.IElementDesc>{
-    if ((elem === undefined) || (elem === null)){
-      return Q.resolve(null);
-    }
-    elem.url = null;
-    var id = elem.id;
-    var attachmentId = elem.avatarid;
-    if ((id === null)|| (attachmentId === null)){
-      return Q.resolve(elem);
-    }
-    return this.dataService.get_attachment(id.toString(),attachmentId.toString()).then((blob:Blob)=>{
-      var xurl = window.URL.createObjectURL(blob);
-      elem.url = xurl;
-      return elem;
-    },(err)=>{
-      return elem;
-    });
-  }// retrieve_one_avatar
   public retrieve_avatars(elems:InfoData.IElementDesc[]) : any {
+    if ((elems === undefined) || (elems === null)){
+      return Q.resolve([]);
+    }
     var pp:any[] = [];
     var n = elems.length;
     for (var i = 0; i < n; ++i){
-      pp.push(this.retrieve_one_avatar(elems[i]));
+      var elem = elems[i];
+      elem.url = null;
+      var id = elem.avatardocid;
+      var attachmentId = elem.avatarid;
+      pp.push(elem.check_url(this.dataService))
     }// i
-    return Q.all(pp);
+    if (pp.length > 0){
+      return Q.all(pp);
+    } else {
+      return Q.resolve([]);
+    }
   }// retrieve_avatars
   public refreshAll() : any {
     this.prev_key = null;
@@ -109,30 +216,45 @@ class PagedViewModel extends BaseViewModel {
     var bAttach = null;
     var model = this.modelItem;
     this.clear_error();
-    this.dataService.get_items_range(model,startKey, endKey, skip,limit,
-    descending,bIncludeEnd,bDoc,bAttach).then((rr)=>{
-      var temp = this.convert_elems(rr);
-      this.retrieve_avatars(temp).then((dd)=>{
-        if ((dd !== undefined) && (dd !== null)){
-          this.prev_key = startKey;
-          var n = dd.length;
-          if (n < limit){
-            this.next_key = null;
-            this.canNextPage(false);
-          } else  if (n > 0) {
-            this.skip = 0;
-            var x = dd[ n - 1];
-            this.next_key = x.key;
-            this.canNextPage(true);
-          }
-          this.items(dd);
+    var oldid = (this._current_data() !== null) ? this._current_data().id : null;
+    this.dataService.find_elements_range(model.index_name,startKey, endKey, skip,limit,
+    descending,bIncludeEnd,bDoc,bAttach).then((rr:InfoData.IElementDesc[])=>{
+      return this.retrieve_avatars(rr);
+    }).then((dd)=>{
+      if ((dd !== undefined) && (dd !== null)){
+        this.prev_key = startKey;
+        var n = dd.length;
+        if (n < limit){
+          this.next_key = null;
+          this.canNextPage(false);
+        } else  if (n > 0) {
+          this.skip = 0;
+          var x = dd[ n - 1];
+          this.next_key = x.key;
+          this.canNextPage(true);
         }
-      },(ex)=>{
-        this.set_error(ex);
-      });
-    },(err)=>{
-      this.set_error(err);limit
+        this.items(dd);
+        var pSel:InfoData.IElementDesc = null;
+        if (oldid !== null){
+          var n = dd.length;
+          for (var i = 0; i < n; ++i){
+            var x = dd[i];
+            if (x.id == oldid){
+              pSel = x;
+              break;
+            }
+          }// i
+        }// old
+        this.current(pSel);
+        if (dd.length < 1){
+          this.addNew();
+        }
+      } else {
+        this.items([]);
+        this.addNew();
+      }
     });
+    //
   }// refresh
 }// class PagedViewModel
 export = PagedViewModel;

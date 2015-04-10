@@ -32,8 +32,10 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
     return this.base_prefix + '-' + this.semestreid + '-' + this.matiereid;
   }
   public create_id():  string{
-    return this.search_prefix + '-' +
-    '-' + this.enseignantid + '-' + this.groupeid + '-' + (new Date()).toISOString();
+    var d:Date = (this.has_startDate) ? this.startDate : new Date();
+    var s = (d.toISOString()).substr(0,10);
+    return this.semestreid + '-' + this.matiereid +
+    '-' + this.enseignantid + '-' + this.groupeid + '-' + s;
   }// create_id
   //
   public get matiereid(): any {
@@ -79,6 +81,15 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
   }
   //
   public get is_storeable(): boolean {
+    var bRet:boolean = (this.type !== null) && (this.collection_name !== null) &&
+      (this.departementid !== null) && (this.anneeid !== null) &&
+       (this.semestreid !== null) &&
+      (this.groupeid !== null) && (this.personid !== null) && (this.enseignantid !== null) &&
+      (this.uniteid !== null) && (this.matiereid !== null) && (this.firstname !== null) &&
+      (this.lastname !== null);
+      if (!bRet){
+        return false;
+      }
     if (this.has_startDate && this.has_endDate) {
       if (this.startDate.getTime() > this.endDate.getTime()) {
         return false;
@@ -86,10 +97,7 @@ class ProfAffectation extends Affectation implements InfoData.IProfAffectation {
     } else if (this.has_startDate || this.has_endDate) {
       return false;
     }
-    return (this.type != null) && (this.collection_name != null) &&
-      this.has_departementid && this.has_anneeid && this.has_semestreid &&
-      this.has_personid && this.has_groupeid && this.has_enseignantid &&
-      this.has_uniteid && this.has_matiereid;
+    return true;
   }
   public to_insert_map(oMap: any): void {
     super.to_insert_map(oMap);

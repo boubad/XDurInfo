@@ -14,7 +14,6 @@ class DescriptionItem extends BaseItem  implements InfoData.IDescriptionItem {
       if (oMap.description !== undefined) {
         this.description = oMap.description;
       }
-
     } // oMap
   } // constructor
   public get description(): string {

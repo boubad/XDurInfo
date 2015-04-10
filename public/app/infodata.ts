@@ -108,7 +108,6 @@ export interface IPerson extends IDescriptionItem {
   matiereids: any[];
   uniteids: any[];
   groupeids: any[];
-  infoids: any[];
   //
   fullname: string;
   //
@@ -126,7 +125,6 @@ export interface IPerson extends IDescriptionItem {
   has_uniteids: boolean;
   has_matiereids: boolean;
   has_groupeids: boolean;
-  has_infoids: boolean;
   //
   reset_password: () => void;
   check_password: (ct: string) => boolean;
@@ -155,8 +153,6 @@ export interface IPerson extends IDescriptionItem {
   remove_matiereid: (id: any) => void;
   add_groupeid: (id: any) => void;
   remove_groupeid: (id: any) => void;
-  add_infoid: (id: any) => void;
-  remove_infoid: (id: any) => void;
 }// interface IPerson
 export interface IProfPerson extends IPerson {
 
@@ -296,7 +292,6 @@ export interface IBaseEvent extends IDepartementChild {
   personid: any;
   date: Date;
   genre: string;
-  documentids: any[];
   status: string;
   //
   has_anneeid: boolean;
@@ -307,11 +302,8 @@ export interface IBaseEvent extends IDepartementChild {
   has_personid: boolean;
   has_date: boolean;
   has_genre: boolean;
-  has_documentids: boolean;
   has_status: boolean;
   //
-  add_documentid: (id: any) => void;
-  remove_documentid: (id: any) => void;
 }// interface IBaseEvent
 //
 export interface IGroupeEvent extends IBaseEvent {
@@ -355,16 +347,9 @@ export interface IMenuDesc {
   desc?: string;
   img_source?: string;
 }
-export interface IElementDesc {
-  id:any;
-  text:string;
-  rev?:string;
-  avatarid?:any;
-  url?:string;
-  key?:any;
-  value?:any;
-}
+
 export interface IDatabaseManager {
+  create_item : (oMap:any) => IBaseItem;
   isConnected: () => Q.IPromise<boolean>;
   get_item_by_id: (id: string) => Q.IPromise<IBaseItem>;
   get_items_array: (ids: string[]) => Q.IPromise<IBaseItem[]>;
@@ -372,13 +357,27 @@ export interface IDatabaseManager {
   maintains_items: (items: IBaseItem[]) => Q.IPromise<IBaseItem[]>;
   remove_items: (items: IBaseItem[]) => Q.IPromise<boolean>
   remove_one_item: (item: IBaseItem) => Q.IPromise<boolean>;
-  get_items_range: (item:IBaseItem,startKey?: any, endKey?: any, skip?:number,limit?: number,
-  descending?: boolean,bIncludeEnd?:boolean,bDoc?:boolean,bAttach?:boolean) => Q.IPromise<any[]>;
-  get_items_count: (item:IBaseItem,startKey?: string, endKey?:string) => Q.IPromise<number>;
   find_person_by_username :(username:string) => Q.IPromise<IBaseItem>;
   maintains_attachment: (item:IBaseItem, attachmentId:string, attachment:Blob,type:string) => Q.IPromise<boolean>;
   get_attachment: (item:IBaseItem, attachmentId:string) => Q.IPromise<Blob>;
+  get_docid_attachment: (docid:string, attachmentId:string) => Q.IPromise<Blob>;
   remove_attachment: (item:IBaseItem, attachmentId:string) => Q.IPromise<boolean>;
+  find_elements_range: (viewName:string,startKey?: any, endKey?: any, skip?:number,limit?: number,
+  descending?: boolean,bIncludeEnd?:boolean,bDoc?:boolean,bAttach?:boolean) => Q.IPromise<any[]>;
   //
-
 }// interface IDatabaseManager
+export interface IElementDesc {
+  id:string;
+  text?:string;
+  rev?:string;
+  avatardocid?:string;
+  avatarid?:any;
+  url?:string;
+  personid?:string;
+  startDate?:Date;
+  endDate?:Date;
+  //
+  hasUrl: boolean;
+  //
+  check_url: (server?: IDatabaseManager)=> Q.IPromise<any>
+}

@@ -11,7 +11,8 @@ class Affectation extends DepartementChild implements InfoData.IAffectation {
   private _personid: any;
   private _start: Date;
   private _end: Date;
-  private _fullname: string;
+  public firstname: string;
+  public lastname: string;
   //
   constructor(oMap?: any) {
     super(oMap);
@@ -21,6 +22,8 @@ class Affectation extends DepartementChild implements InfoData.IAffectation {
     this._personid = null;
     this._start = null;
     this._end = null;
+    this.firstname = null;
+    this.lastname = null;
     if ((oMap !== undefined) && (oMap !== null)) {
       if (oMap.anneeid !== undefined) {
         this.anneeid = oMap.anneeid;
@@ -40,22 +43,35 @@ class Affectation extends DepartementChild implements InfoData.IAffectation {
       if (oMap.endDate !== undefined) {
         this.endDate = oMap.endDate;
       }
-      if (oMap.fullname !== undefined){
-        this.fullname = oMap.fullname;
+      if (oMap.firstname !== undefined){
+        this.firstname = oMap.firstname;
+      }
+      if (oMap.lastname !== undefined){
+        this.lastname = oMap.lastname;
       }
     }// oMap
   }// constructor
   public get search_prefix(): string {
     return this.base_prefix + '-' + this.semestreid;
   }
+  public get has_firstname():boolean {
+    return (this.firstname !== null);
+  }
+  public get has_lastname():boolean {
+    return (this.lastname !== null);
+  }
   public get fullname(): string {
-    return this._fullname;
-  }
-  public set fullname(s:string){
-      this._fullname = ((s !== undefined) && (s !== null) &&
-      (s.trim().length > 0)) ? s.trim() : null;
-  }
-  public get has_fullname():boolean {
+    var s = '';
+    if (this.has_lastname) {
+      s = this.lastname;
+    }
+    if (this.has_firstname) {
+      s = s + ' ' + this.firstname;
+    }
+    s = s.trim();
+    return (s.length > 0) ? s : null;
+  } // fullname
+  public get has_fullname(): boolean {
     return (this.fullname !== null);
   }
   //
@@ -107,7 +123,6 @@ class Affectation extends DepartementChild implements InfoData.IAffectation {
     return (this.groupeid !== null);
   }
   //
-  //
   public get anneeid(): any {
     return this._anneeid;
   }
@@ -139,7 +154,9 @@ class Affectation extends DepartementChild implements InfoData.IAffectation {
   //
   public get is_storeable(): boolean {
     return (this.type !== null) && (this.collection_name !== null) &&
-      (this.departementid !== null);
+      (this.departementid !== null) && (this.anneeid !== null) &&
+       (this.semestreid !== null) &&
+      (this.groupeid !== null) && (this.personid !== null);
   }
   public to_insert_map(oMap: any) : void {
     super.to_insert_map(oMap);
@@ -150,7 +167,8 @@ class Affectation extends DepartementChild implements InfoData.IAffectation {
       oMap.personid = this.personid;
       oMap.startDate = this.startDate;
       oMap.endDate = this.endDate;
-      oMap.fullname = this.fullname;
+      oMap.firstname = this.firstname;
+      oMap.lastname = this.lastname;
   }// to_insert_map
   public sort_func(p1:InfoData.IAffectation, p2:InfoData.IAffectation): number {
         var vRet = -1;

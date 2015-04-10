@@ -17,6 +17,9 @@ class DepartementChildItem extends DescriptionItem implements InfoData.IDepartem
   public get search_prefix(): string {
     return this.base_prefix + '-' + this.departementid;
   }
+  public create_id():  string{
+    return this.base_prefix + '-' + this.departementid;
+  }// create_id
   public get departementid(): any {
     return this._departementid;
   }
