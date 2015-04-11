@@ -4,18 +4,19 @@
 import router = require('plugins/router');
 import app = require('durandal/app');
 import BaseViewModel = require('data/model/baseviewmodel');
-import CouchDatabase = require('data/local/couchlocaldatabase');
+import dataService = require('./dataservice');
 //
 class ShellClass extends BaseViewModel {
-  public router:any;
   constructor(){
-    super(new CouchDatabase());
+    super(dataService);
     this.router = router;
   }// constructor
   public activate(): any {
     router.map([
     /*  { route: '', title: 'Welcome', moduleId: 'viewmodels/welcome', nav: true }, */
       { route: '', moduleId: 'viewmodels/login', nav: true, title:'Accueil' },
+      { route: 'home', moduleId: 'viewmodels/home', nav: true, title:''},
+      { route: 'profil', moduleId: 'viewmodels/profil', nav: true, title:'' },
       { route: 'flickr', moduleId: 'viewmodels/flickr', nav: true }
     ]).buildNavigationModel();
 

@@ -6,7 +6,6 @@ import BaseViewModel = require('././baseviewmodel');
 //
 class LoginViewModel extends BaseViewModel {
   //
-  //
   constructor(server?: InfoData.IDatabaseManager) {
     super(server);
   }// constructor

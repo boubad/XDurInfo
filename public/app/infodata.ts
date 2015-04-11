@@ -76,6 +76,10 @@ export interface IBaseItem {
   optionBac?: string;
   mentionBac?: string;
   etudesSuperieures?: string;
+  //
+  reset_password?: () => void;
+  check_password?: (ct: string) => boolean;
+  change_password?: (ct: string) => void;
 }// interface IBaseItem
 export interface IDescriptionItem extends IBaseItem {
   description: string;

@@ -10,7 +10,7 @@ class Departements extends DepartementViewModel {
     this.title('Départements');
   }// constructor
   public canActivate(){
-    var pPers = userinfo.person;
+    var pPers = this.person();
     if (pPers === null){
       return false;
     }
@@ -18,3 +18,5 @@ class Departements extends DepartementViewModel {
     return bRet;
   }// canActivate
 }//class Departements
+var pv = new Departements();
+export = pv;

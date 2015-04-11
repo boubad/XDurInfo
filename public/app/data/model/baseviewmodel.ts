@@ -1,4 +1,5 @@
 //baseviewmodel.ts
+/// <reference path='../../../lib/typings/durandal/durandal.d.ts'/>
 /// <reference path='../../../lib/typings/knockout/knockout.d.ts' />
 /// <reference path='../../../lib/typings/pouchdb/pouchdb.d.ts'/>
 /// <reference path='../../../lib/typings/q/Q.d.ts'/>
@@ -12,6 +13,8 @@ import userinfo = require('./userinfo');
 import CouchDatabase = require('../local/couchlocaldatabase');
 //
 class BaseViewModel {
+  //
+  public router:DurandalRouter;
   //
   public username:KnockoutObservable<string>;
   public password:KnockoutObservable<string>;
@@ -38,10 +41,21 @@ class BaseViewModel {
   //
   public canConnect:KnockoutComputed<boolean>;
   //
+  public _current_data:KnockoutObservable<InfoData.IBaseItem>;
+  public description:KnockoutComputed<string>;
+  public canSave:KnockoutComputed<boolean>;
+  public canRemove:KnockoutComputed<boolean>;
+  public canAdd:KnockoutComputed<boolean>;
+  public canCancel:KnockoutComputed<boolean>;
+  public add_mode:KnockoutObservable<boolean>;
+  //
   constructor(server?: InfoData.IDatabaseManager) {
     this.dataService = ((server !== undefined) && (server !== null)) ? server :
      new CouchDatabase();
     //
+    this.router = null;
+    this._current_data = ko.observable(null);
+    this.add_mode = ko.observable(false);
     this.username = ko.observable(null);
     this.password = ko.observable(null);
     this.title = ko.observable(null);
@@ -91,7 +105,98 @@ class BaseViewModel {
         var p = this.person();
         return (p !== null) && p.is_prof;
     },this);
+    this.canSave = ko.computed(()=>{
+      var x = this._current_data();
+      return (x !== null) && x.is_storeable;
+    },this);
+    this.canRemove = ko.computed(()=>{
+      var x = this._current_data();
+      return (x !== null) && (x.id !== null) && (x.rev !== null);
+    },this);
+    this.canAdd = ko.computed(()=>{
+      var x = this.add_mode();
+      return (!x);
+    },this);
+    this.canCancel = ko.computed(()=>{
+      var x = this.add_mode();
+      return x;
+    },this);
+    this.description = ko.computed({
+      read: ()=>{
+        var x = this._current_data();
+        return (x !== null) ? x.description : null;
+      },
+      write: (s: string) => {
+        var x = this._current_data();
+        if (x !== null){
+          this._current_data(null);
+          x.description = s;
+          this._current_data(x);
+        }
+      },
+      owner : this
+    });
   }// constructor
+  //
+  public create_item(): InfoData.IBaseItem {
+    return null;
+  }// create_item
+  public addNew(): any {
+    var x = this.create_item();
+    if (x !== null){
+      this._current_data(x);
+      this.add_mode(true);
+    }
+
+  }// addNew
+  public cancel() : any {
+    this.add_mode(false);
+  }
+  public refresh(): any {
+
+  }
+  public refreshAll(): any {
+
+  }
+  public save() : any {
+    var item = this._current_data();
+    if ((item == undefined) || (item === null)){
+      return;
+    }
+    if (!item.is_storeable){
+      return;
+    }
+    var bOld = (item.rev !== null);
+    this.clear_error();
+    this.dataService.maintains_one_item(item).then((p)=>{
+      if (!bOld){
+        this.refreshAll();
+      } else {
+        this.refresh();
+      }
+    },(err)=>{
+      this.set_error(err);
+    });
+  }// save
+  public remove(){
+    var item = this._current_data();
+    if ((item == undefined) || (item === null)){
+      return;
+    }
+    if ((item.id === null) || (item.rev === null)){
+      return;
+    }
+    var message = 'Voulez-vous vraiment supprimer cet element: ' + item.id + ' ?';
+    if (!this.confirm(message)){
+      return;
+    }
+    this.clear_error();
+    this.dataService.remove_one_item(item).then((p)=>{
+        this.refreshAll();
+    },(err)=>{
+      this.set_error(err);
+    });
+  }// remove
   //
   public confirm(message:string) : boolean {
     return window.confirm(message);
@@ -139,14 +244,26 @@ class BaseViewModel {
             if ((id !== undefined) && (id !== null)){
                this.get_avatar_url(p.id,id).then((xurl:string)=>{
                  this.userPhotoUrl(xurl);
+                 this.update_title();
+                 this.update_menu();
+                 navigate('#home');
                });
-            }// avatar
+            } else {
+              this.update_title();
+              this.update_menu();
+              navigate('#home');
+            }
          }// ok
       }// p
     },(err:PouchError)=>{
       this.set_error(err);
     });
   }// connect
+  public navigate(url:string) : any {
+    if (this.router !== null){
+      this.router.navigate(url);
+    }
+  }
   //
   public disconnect():void {
     this.person(null);
@@ -156,6 +273,7 @@ class BaseViewModel {
     this.password(null);
     this.isConnected(false);
     userinfo.person = null;
+    navigate('#login');
   }
   //
   public update_title(): void {

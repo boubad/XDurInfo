@@ -1,0 +1,82 @@
+<div class="container">
+  <div class="page-header">
+    <h1>
+      <span data-bind="text: title()"></span>
+    </h1>
+  </div>
+  <div data-bind="visible: hasError()" class="text-danger">
+    <strong>
+      <span data-bind="text: error()"></span>
+    </strong>
+  </div>
+  <div data-bind="visible: hasInfo()" class="text-success">
+    <strong>
+      <span data-bind="text: info()"></span>
+    </strong>
+  </div>
+  <div data-bind="visible: isConnected()">
+    <div class="row">
+      <div class="col-xs-8" />
+      <div class="col-xs-1">
+        <a data-bind="attr:{href: '#home'}">Accueil
+        </a>
+      </div>
+      <div class="col-xs-1">
+        <strong>
+          <span data-bind="text: userFullName()"></span>
+        </strong>
+      </div>
+      <div class="col-xs-1" data-bind="visible: hasPhotoUrl()">
+        <img data-bind="attr: {src: userPhotoUrl()}" height='48' />
+      </div>
+      <div class="col-xs-1">
+        <a data-bind="click: disconnect">Déconnecter</a>
+      </div>
+    </div>
+    <div>
+    </div>
+    <form role="form">
+      <div class="form-group">
+        <label for="oldpwd">Ancien mot de passe:</label>
+        <input type="password" class="form-control" id="oldpwd" data-bind="value: oldPassword"
+         placeholder="Ancien mot de passe"/>
+         <label for="newpwd">Nouveau mot de passe:</label>
+         <input type="password" class="form-control" id="newpwd" data-bind="value: newPassword"
+          placeholder="Nouveau mot de passe"/>
+          <label for="confirmpwd">Confirmation nouveau mot de passe:</label>
+          <input type="password" class="form-control" id="confirmpwd" data-bind="value: confirmPassword"
+           placeholder="Confirmation mot de passe"/>
+           <button type="button" class="btn btn-primary"
+           data-bind="visible: canChangePwd(), click: changePwd">Changer mot de passe</button>
+      </div>
+      <div class="form-group">
+        <label for="lastname">Nom de famille:</label>
+        <input type="text" class="form-control" id="lastname" data-bind="value: lastname"
+         placeholder="Nom de famille" required />
+      </div>
+      <div class="form-group">
+        <label for="firstname">Prénom(s):</label>
+        <input type="text" class="form-control" id="firstname" data-bind="value: firstname"
+         placeholder="Prénom(s)" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Courriel:</label>
+        <input type="email" class="form-control" id="email" data-bind="value: email"
+         placeholder="Adresse courriel" required />
+      </div>
+      <div class="form-group">
+        <label for="phone">Téléphone:</label>
+        <input type="text" class="form-control" id="phone" data-bind="value: phone"
+         placeholder="Téléphone" required />
+      </div>
+      <div class="form-group">
+        <label for="description">Remarques:</label>
+        <textarea class="form-control" id="description" data-bind="value: description"></textarea>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" data-bind="visible: canSave(), click: save">Modifier</button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
